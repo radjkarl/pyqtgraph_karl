@@ -4,17 +4,23 @@ from .DockDrop import *
 from ..widgets.VerticalLabel import VerticalLabel
 from ..python2_3 import asUnicode
 
+from Container import TContainer
+
 class Dock(QtGui.QWidget, DockDrop):
     
     sigStretchChanged = QtCore.Signal()
     
-    def __init__(self, name, area=None, size=(10, 10), widget=None, hideTitle=False, autoOrientation=True, closable=False):
+    def __init__(self, name, area=None, size=(10, 10), widget=None, hideTitle=False, 
+                 autoOrientation=True, closable=False, minimizable=True):
         QtGui.QWidget.__init__(self)
         DockDrop.__init__(self)
         self.area = area
-        self.label = DockLabel(name, self, closable)
+        self.label = DockLabel(name, self, closable, minimizable)
         if closable:
             self.label.sigCloseClicked.connect(self.close)
+        if minimizable:
+            self.label.sigMinClicked.connect(self.minimize)
+            self.label.sigMaxClicked.connect(self.maximize)
         self.labelHidden = False
         self.moveLabel = True  ## If false, the dock is no longer allowed to move the label.
         self.autoOrient = autoOrientation
@@ -199,6 +205,8 @@ class Dock(QtGui.QWidget, DockDrop):
         self.updateStyle()
         
     def float(self):
+        if self.label.minimized:
+            self.label.minClicked()
         self.area.floatDock(self)
             
     def containerChanged(self, c):
@@ -224,6 +232,41 @@ class Dock(QtGui.QWidget, DockDrop):
         self._container.apoptose()
         self._container = None
 
+
+    def minimize(self):       
+        try:
+            #try to add dock to the minimized_container:
+            self.area.minimized_container.insert(self)
+            self.area.minimized_docks.append(self)
+        except AttributeError:
+            #there is no minimized-container -> create one
+            m = self.area.minimized_container = TContainer(self.area)
+            #add this container to the bottom of the area:
+            self.area.layout.addWidget(m)
+            #set container to minimim size
+            m.setFixedHeight(self.label.size().height())
+            #apoptose is not needed - this container is closed manually
+            m.apoptose = lambda: 0
+            #add the dock to the container:
+            m.insert(self)
+            self.area.minimized_docks = [self]
+        #'minimize' via hiding its content:
+        self.widgetArea.hide()
+
+
+    def maximize(self):
+        if not self.label.minimized:
+            self.area.minimized_docks.remove(self)
+            #remove dock to the top 
+            self.area.moveDock(self, position='top', neighbor=None)
+            #'maximize' via show its content
+            self.widgetArea.show()
+            if not self.area.minimized_docks:
+                #if there are not other minimized docks: close the container
+                self.area.minimized_container.close()
+                del self.area.minimized_container
+ 
+
     def __repr__(self):
         return "<Dock %s %s>" % (self.name(), self.stretch())
 
@@ -239,15 +282,22 @@ class Dock(QtGui.QWidget, DockDrop):
         DockDrop.dragLeaveEvent(self, *args)
 
     def dropEvent(self, *args):
+        dock = args[0].source() 
+        #maximize the source dock if it is minimized before the drop       
+        if dock.label.minimized:
+            dock.label.minClicked()
         DockDrop.dropEvent(self, *args)
+
 
 
 class DockLabel(VerticalLabel):
     
     sigClicked = QtCore.Signal(object, object)
     sigCloseClicked = QtCore.Signal()
+    sigMinClicked = QtCore.Signal()
+    sigMaxClicked = QtCore.Signal()
     
-    def __init__(self, text, dock, showCloseButton):
+    def __init__(self, text, dock, showCloseButton, showminimizeButton):
         self.dim = False
         self.fixedWidth = False
         VerticalLabel.__init__(self, text, orientation='horizontal', forceWidth=False)
@@ -256,12 +306,36 @@ class DockLabel(VerticalLabel):
         self.updateStyle()
         self.setAutoFillBackground(False)
         self.startedDrag = False
+        self.minimized = False
+
+        self.minButton = None
+        if showminimizeButton:
+            self.minButton = QtGui.QToolButton(self)
+            self.minButton.clicked.connect(self.minClicked)
+            self.minButtonSetIcon()
 
         self.closeButton = None
         if showCloseButton:
             self.closeButton = QtGui.QToolButton(self)
             self.closeButton.clicked.connect(self.sigCloseClicked)
             self.closeButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarCloseButton))
+
+
+    def minButtonSetIcon(self):
+        if self.minimized:
+            self.minButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarMaxButton))
+        else:   
+            self.minButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarMinButton))
+
+
+    def minClicked(self):
+        self.minimized = not self.minimized
+        self.minButtonSetIcon()
+        if self.minimized:
+            self.sigMinClicked.emit()
+        else:
+            self.sigMaxClicked.emit()
+
 
     def updateStyle(self):
         r = '3px'
@@ -342,4 +416,13 @@ class DockLabel(VerticalLabel):
                 pos = QtCore.QPoint(ev.size().width() - size, 0)
             self.closeButton.setFixedSize(QtCore.QSize(size, size))
             self.closeButton.move(pos)
+        if self.minButton:
+            if self.orientation == 'vertical':
+                size = ev.size().width()
+                pos = QtCore.QPoint(0, -4)
+            else:
+                size = ev.size().height()
+                pos = QtCore.QPoint(ev.size().width() - 2*size, 0)
+            self.minButton.setFixedSize(QtCore.QSize(size, size))
+            self.minButton.move(pos)           
         super(DockLabel,self).resizeEvent(ev)
