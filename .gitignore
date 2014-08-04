@@ -7,3 +7,5 @@ deb_build
 dist
 .idea
 rtr.cvs
+/.pydevproject
+/.project
