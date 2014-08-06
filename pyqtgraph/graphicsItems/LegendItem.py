@@ -80,6 +80,16 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         self.layout.addItem(sample, row, 0)
         self.layout.addItem(label, row, 1)
         self.updateSize()
+
+
+    def getLabel(self, plotItem):
+        """
+        return the labelItem inside the legend for a given plotItem
+        the label-text can be changed via labenItem.setText
+        """
+        for i in self.items:
+            if i[0].item == plotItem:
+                return i[1]
     
     def removeItem(self, name):
         """

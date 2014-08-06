@@ -186,6 +186,8 @@ class AxisItem(GraphicsWidget):
         self.update()
         
     def close(self):
+        self.sigLabelChanged.disconnect()
+        self.sigRangeChanged.disconnect()
         self.scene().removeItem(self.label)
         self.label = None
         self.scene().removeItem(self)
@@ -469,11 +471,11 @@ class AxisItem(GraphicsWidget):
         oldView = self.linkedView()
         self._linkedView = weakref.ref(view)
         if self.orientation in ['right', 'left']:
-            if oldView is not None:
+            if oldView is not None:# and oldView != view:
                 oldView.sigYRangeChanged.disconnect(self.linkedViewChanged)
             view.sigYRangeChanged.connect(self.linkedViewChanged)
         else:
-            if oldView is not None:
+            if oldView is not None:# and oldView != view:
                 oldView.sigXRangeChanged.disconnect(self.linkedViewChanged)
             view.sigXRangeChanged.connect(self.linkedViewChanged)
         

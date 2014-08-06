@@ -162,18 +162,8 @@ class PlotItem(GraphicsWidget):
         self.spectrumMode = False
         
         self.legend = None
-        
-        ## Create and place axis items
-        if axisItems is None:
-            axisItems = {}
         self.axes = {}
-        for k, pos in (('top', (1,1)), ('bottom', (3,1)), ('left', (2,0)), ('right', (2,2))):
-            axis = axisItems.get(k, AxisItem(orientation=k))
-            axis.linkToView(self.vb)
-            self.axes[k] = {'item': axis, 'pos': pos}
-            self.layout.addItem(axis, *pos)
-            axis.setZValue(-1000)
-            axis.setFlag(axis.ItemNegativeZStacksBehindParent)
+        self.setAxes(axisItems)
         
         self.titleLabel = LabelItem('', size='11pt')
         self.layout.addItem(self.titleLabel, 0, 1)
@@ -284,6 +274,23 @@ class PlotItem(GraphicsWidget):
         if len(kargs) > 0:
             self.plot(**kargs)
         
+ 
+    def setAxes(self, axisItems):
+        """
+        Create and place axis items
+        For valid values for axisItems see __init__
+        """
+        if axisItems is None:
+            axisItems = {}
+        self.axes = {}
+        for k, pos in (('top', (1,1)), ('bottom', (3,1)), ('left', (2,0)), ('right', (2,2))):
+            axis = axisItems.get(k, AxisItem(orientation=k))
+            axis.linkToView(self.vb)
+            self.axes[k] = {'item': axis, 'pos': pos}
+            self.layout.addItem(axis, *pos)
+            axis.setZValue(-1000)
+            axis.setFlag(axis.ItemNegativeZStacksBehindParent)
+ 
         
     def implements(self, interface=None):
         return interface in ['ViewBoxWrapper']
