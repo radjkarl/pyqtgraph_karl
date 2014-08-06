@@ -34,11 +34,7 @@ class AxisItem(GraphicsWidget):
         GraphicsWidget.__init__(self, parent)
         self.label = QtGui.QGraphicsTextItem(self)
         self.picture = None
-        self.orientation = orientation
-        if orientation not in ['left', 'right', 'top', 'bottom']:
-            raise Exception("Orientation argument must be one of 'left', 'right', 'top', or 'bottom'.")
-        if orientation in ['left', 'right']:
-            self.label.rotate(-90)
+        self.setOrientation(orientation)
             
         self.style = {
             'tickTextOffset': [5, 2],  ## (horizontal, vertical) spacing between text and axis 
@@ -90,6 +86,19 @@ class AxisItem(GraphicsWidget):
         
         self.grid = False
         #self.setCacheMode(self.DeviceCoordinateCache)
+
+
+    def setOrientation(self, orientation):
+        """
+        orientation = 'left', 'right', 'top', 'bottom'
+        """
+        if orientation not in ['left', 'right', 'top', 'bottom']:
+            raise Exception("Orientation argument must be one of 'left', 'right', 'top', or 'bottom'.")
+        if orientation in ['left', 'right']:
+            self.label.rotate(-90)
+        self.orientation = orientation
+        self.update()
+
 
     def setStyle(self, **kwds):
         """
