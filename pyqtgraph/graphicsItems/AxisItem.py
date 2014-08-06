@@ -16,6 +16,9 @@ class AxisItem(GraphicsWidget):
     Ticks can be extended to draw a grid.
     If maxTickLength is negative, ticks point into the plot. 
     """
+    sigLabelChanged = QtCore.Signal(object, object, object, object)#text, unit, prefix, args
+    sigRangeChanged = QtCore.Signal(object, object)#mn, mx
+
     
     def __init__(self, orientation, pen=None, linkView=None, parent=None, maxTickLength=-5, showValues=True):
         """
@@ -98,6 +101,21 @@ class AxisItem(GraphicsWidget):
             self.label.rotate(-90)
         self.orientation = orientation
         self.update()
+
+
+    def newLinkedAxis(self, orientation=None, **kwargs):
+        """
+        Return a new axis sharing the same name and range (more attributes following...)
+        """
+        if orientation == None:
+            orientation = self.orientation
+        axis = AxisItem(orientation, **kwargs)
+        if self.label.isVisible():
+            axis.setLabel(self.labelText, self.labelUnits, self.labelUnitPrefix, **self.labelStyle)
+        axis.setRange(*self.range)
+        self.sigLabelChanged.connect(axis.setLabel)
+        self.sigRangeChanged.connect(axis.setRange)
+        return axis
 
 
     def setStyle(self, **kwds):
@@ -274,7 +292,9 @@ class AxisItem(GraphicsWidget):
         self._adjustSize()
         self.picture = None
         self.update()
-            
+        self.sigLabelChanged.emit(text, units, unitPrefix, args)
+
+  
     def labelString(self):
         if self.labelUnits == '':
             if not self.autoSIPrefix or self.autoSIPrefixScale == 1.0:
@@ -434,6 +454,8 @@ class AxisItem(GraphicsWidget):
             self.updateAutoSIPrefix()
         self.picture = None
         self.update()
+        self.sigRangeChanged.emit(mn,mx)
+ 
         
     def linkedView(self):
         """Return the ViewBox this axis is linked to"""
