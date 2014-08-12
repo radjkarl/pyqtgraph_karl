@@ -390,7 +390,26 @@ class ViewBox(GraphicsWidget):
 
     def menuEnabled(self):
         return self.state.get('enableMenu', True)       
-    
+
+    def insertItem(self, pos, item, ignoreBounds=False):
+        """
+        Similar to addItem, but
+        insert the item to a given position
+        """
+        #bound pos between the first and last possible item position:
+        pos = np.clip(pos,0,len(self.addedItems))
+        item.setZValue(pos)
+        #increase zValue of all items behind new item
+        for item in self.addedItems[pos-1:]:
+            item.setZValue(item.zValue()+1)
+        scene = self.scene()
+        if scene is not None and scene is not item.scene():
+            scene.addItem(item)  ## Necessary due to Qt bug: https://bugreports.qt-project.org/browse/QTBUG-18616
+        item.setParentItem(self.childGroup)
+        if not ignoreBounds:
+            self.addedItems.append(item)
+        self.updateAutoRange()        
+
     def addItem(self, item, ignoreBounds=False):
         """
         Add a QGraphicsItem to this view. The view will include this item when determining how to set its range
