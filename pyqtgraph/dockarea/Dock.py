@@ -9,18 +9,28 @@ from Container import TContainer
 class Dock(QtGui.QWidget, DockDrop):
     
     sigStretchChanged = QtCore.Signal()
+    sigMinimized = QtCore.Signal()
+    sigRestored = QtCore.Signal()
+    sigMaximized = QtCore.Signal()
     
     def __init__(self, name, area=None, size=(10, 10), widget=None, hideTitle=False, 
-                 autoOrientation=True, closable=False, minimizable=True):
+                 #ALTERNATIVE: option whether Dock controls (min,max,close) or not
+                 autoOrientation=True, closable=False, minimizable=True, maximizable=True):
         QtGui.QWidget.__init__(self)
         DockDrop.__init__(self)
         self.area = area
-        self.label = DockLabel(name, self, closable, minimizable)
+        self.label = DockLabel(name, self, closable, minimizable, maximizable)
+        
         if closable:
             self.label.sigCloseClicked.connect(self.close)
         if minimizable:
             self.label.sigMinClicked.connect(self.minimize)
+            self.label.sigDeMinClicked.connect(self.deMinimize)
+        if maximizable:
             self.label.sigMaxClicked.connect(self.maximize)
+            self.label.sigDeMaxClicked.connect(self.deMaximize)
+
+
         self.labelHidden = False
         self.moveLabel = True  ## If false, the dock is no longer allowed to move the label.
         self.autoOrient = autoOrientation
@@ -227,6 +237,8 @@ class Dock(QtGui.QWidget, DockDrop):
 
     def close(self):
         """Remove this dock from the DockArea it lives inside."""
+        if self.label.maximized:
+            self.label.toggleMaximize()
         self.setParent(None)
         self.label.setParent(None)
         self._container.apoptose()
@@ -252,9 +264,10 @@ class Dock(QtGui.QWidget, DockDrop):
             self.area.minimized_docks = [self]
         #'minimize' via hiding its content:
         self.widgetArea.hide()
-
-
-    def maximize(self):
+        self.sigMinimized.emit()
+    
+    
+    def deMinimize(self):
         if not self.label.minimized:
             self.area.minimized_docks.remove(self)
             #remove dock to the top 
@@ -265,7 +278,24 @@ class Dock(QtGui.QWidget, DockDrop):
                 #if there are not other minimized docks: close the container
                 self.area.minimized_container.close()
                 del self.area.minimized_container
- 
+            self.sigRestored.emit()
+
+
+    def maximize(self):
+        if self.label.minimized:
+            self.label.toggleMinimize()
+        for dock in self.area.docks.values():
+            if dock != self:
+                dock.hide()
+
+
+    def deMaximize(self):
+        if self.label.minimized:
+            self.label.toggleMinimize()
+        for dock in self.area.docks.values():
+            if dock != self and dock._container:#if not closed
+                dock.show()
+
 
     def __repr__(self):
         return "<Dock %s %s>" % (self.name(), self.stretch())
@@ -295,9 +325,13 @@ class DockLabel(VerticalLabel):
     sigClicked = QtCore.Signal(object, object)
     sigCloseClicked = QtCore.Signal()
     sigMinClicked = QtCore.Signal()
+    sigDeMinClicked = QtCore.Signal()
     sigMaxClicked = QtCore.Signal()
+    sigDeMaxClicked = QtCore.Signal()
+
     
-    def __init__(self, text, dock, showCloseButton, showminimizeButton):
+    def __init__(self, text, dock, 
+                 showCloseButton, showMinimizeButton, showMaximizeButton):
         self.dim = False
         self.fixedWidth = False
         VerticalLabel.__init__(self, text, orientation='horizontal', forceWidth=False)
@@ -307,12 +341,19 @@ class DockLabel(VerticalLabel):
         self.setAutoFillBackground(False)
         self.startedDrag = False
         self.minimized = False
+        self.maximized = False
 
         self.minButton = None
-        if showminimizeButton:
+        if showMinimizeButton:
             self.minButton = QtGui.QToolButton(self)
-            self.minButton.clicked.connect(self.minClicked)
+            self.minButton.clicked.connect(self.toggleMinimize)
             self.minButtonSetIcon()
+            
+        self.maxButton = None 
+        if showMaximizeButton:
+            self.maxButton = QtGui.QToolButton(self)
+            self.maxButton.clicked.connect(self.toggleMaximize)
+            self.maxButtonSetIcon()
 
         self.closeButton = None
         if showCloseButton:
@@ -323,18 +364,36 @@ class DockLabel(VerticalLabel):
 
     def minButtonSetIcon(self):
         if self.minimized:
-            self.minButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarMaxButton))
+            self.minButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarNormalButton))
         else:   
             self.minButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarMinButton))
 
+    def maxButtonSetIcon(self):
+        if self.maximized:
+            self.maxButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarNormalButton))
+        else:   
+            self.maxButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarMaxButton))
 
-    def minClicked(self):
+
+
+    def toggleMinimize(self):
         self.minimized = not self.minimized
         self.minButtonSetIcon()
         if self.minimized:
             self.sigMinClicked.emit()
         else:
+            self.sigDeMinClicked.emit()
+
+
+    def toggleMaximize(self):
+        self.maximized = not self.maximized
+        self.maxButtonSetIcon()
+        if self.maximized:
+            self.minButton.hide()
             self.sigMaxClicked.emit()
+        else:
+            self.minButton.show()
+            self.sigDeMaxClicked.emit()
 
 
     def updateStyle(self):
@@ -416,13 +475,22 @@ class DockLabel(VerticalLabel):
                 pos = QtCore.QPoint(ev.size().width() - size, 0)
             self.closeButton.setFixedSize(QtCore.QSize(size, size))
             self.closeButton.move(pos)
-        if self.minButton:
+        if self.maxButton:
             if self.orientation == 'vertical':
                 size = ev.size().width()
                 pos = QtCore.QPoint(0, -4)
             else:
                 size = ev.size().height()
                 pos = QtCore.QPoint(ev.size().width() - 2*size, 0)
+            self.maxButton.setFixedSize(QtCore.QSize(size, size))
+            self.maxButton.move(pos)  
+        if self.minButton:
+            if self.orientation == 'vertical':
+                size = ev.size().width()
+                pos = QtCore.QPoint(0, -4)
+            else:
+                size = ev.size().height()
+                pos = QtCore.QPoint(ev.size().width() - 3*size, 0)
             self.minButton.setFixedSize(QtCore.QSize(size, size))
             self.minButton.move(pos)           
         super(DockLabel,self).resizeEvent(ev)
