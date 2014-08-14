@@ -629,6 +629,14 @@ class TextParameterItem(WidgetParameterItem):
         self.subItem = QtGui.QTreeWidgetItem()
         self.addChild(self.subItem)
 
+    def selected(self, value):
+        #this dummymethod prevent the following error:
+            #Traceback (most recent call last):
+            #File "/usr/lib/pymodules/python2.7/pyqtgraph/parametertree/ParameterTree.py", line 107, in selectionChanged
+            #self.lastSel.selected(False)
+            #AttributeError: 'QTreeWidgetItem' object has no attribute 'selected'
+        pass
+
     def treeWidgetChanged(self):
         ## TODO: fix so that superclass method can be called
         ## (WidgetParameter should just natively support this style)
@@ -644,7 +652,7 @@ class TextParameterItem(WidgetParameterItem):
         self.textBox = QtGui.QTextEdit()
         self.textBox.setMaximumHeight(100)
         self.textBox.setReadOnly(self.param.opts.get('readonly', False))
-        self.textBox.value = lambda: str(self.textBox.toPlainText())
+        self.textBox.value = lambda: unicode(self.textBox.toPlainText())
         self.textBox.setValue = self.textBox.setPlainText
         self.textBox.sigChanged = self.textBox.textChanged
         return self.textBox
