@@ -508,7 +508,10 @@ class ListParameterItem(WidgetParameterItem):
         try:
             self.widget.blockSignals(True)
             val = self.targetValue  #asUnicode(self.widget.currentText())
-            
+            if val != None:
+                # because self.setValue wont be executed every time
+                # self.targetValue can sometimes be wrong
+                val = param.value()
             self.widget.clear()
             for k in self.forward:
                 self.widget.addItem(k)
