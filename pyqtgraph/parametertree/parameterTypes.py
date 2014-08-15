@@ -53,7 +53,9 @@ class WidgetParameterItem(ParameterItem):
         modDir = os.path.dirname(__file__)
         self.defaultBtn.setIcon(QtGui.QIcon(pixmaps.getPixmap('default')))
         self.defaultBtn.clicked.connect(self.defaultClicked)
-        
+        #hide defaults-button if param is readonly:
+        if opts.get('readonly', False):
+            self.defaultBtn.hide()        
         self.displayLabel = QtGui.QLabel()
         
         layout = QtGui.QHBoxLayout()
