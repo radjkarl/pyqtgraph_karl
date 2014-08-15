@@ -66,7 +66,22 @@ class WidgetParameterItem(ParameterItem):
         layout.addWidget(self.defaultBtn)
         self.layoutWidget = QtGui.QWidget()
         self.layoutWidget.setLayout(layout)
-        
+
+        if param.opts.get('sliding', False):
+            #add slide up/down button to the parameterItem:
+            btnlayout = QtGui.QVBoxLayout() 
+            slideBtnUp = QtGui.QPushButton()
+            slideBtnDown = QtGui.QPushButton()
+            for btn in (slideBtnUp, slideBtnDown):
+                btn.setFixedWidth(10)
+                btn.setFixedHeight(10)
+                btnlayout.addWidget(btn)
+            slideBtnUp.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_ArrowUp))
+            slideBtnDown.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_ArrowDown))
+            slideBtnUp.clicked.connect(lambda: self.param.slide(-1))
+            slideBtnDown.clicked.connect(lambda: self.param.slide(1))
+            layout.addLayout(btnlayout)
+
         if w.sigChanged is not None:
             w.sigChanged.connect(self.widgetValueChanged)
             

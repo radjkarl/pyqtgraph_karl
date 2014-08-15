@@ -51,6 +51,7 @@ class Parameter(QtCore.QObject):
     sigDefaultChanged(self, default)     Emitted when this parameter's default value has changed
     sigNameChanged(self, name)           Emitted when this parameter's name has changed
     sigOptionsChanged(self, opts)        Emitted when any of this parameter's options have changed
+    sigMoved(self, child, index)         Emitted if a child is moved to another position
     ===================================  =========================================================
     """
     ## name, type, limits, etc.
@@ -66,6 +67,7 @@ class Parameter(QtCore.QObject):
     sigDefaultChanged = QtCore.Signal(object, object)  ## self, default
     sigNameChanged = QtCore.Signal(object, object)  ## self, name
     sigOptionsChanged = QtCore.Signal(object, object)  ## self, {opt:val, ...}
+    sigMoved = QtCore.Signal(object, object, int) ## self, child, index
     
     ## Emitted when anything changes about this parameter at all.
     ## The second argument is a string indicating what changed ('value', 'childAdded', etc..)
@@ -533,6 +535,25 @@ class Parameter(QtCore.QObject):
     def hasChildren(self):
         """Return True if this Parameter has children."""
         return len(self.childs) > 0
+
+    def slide(self, nPos):
+        '''change the position within the same level +-nPos'''
+        p = self.parent()
+        if p:
+            index = p.childs.index(self)
+            self.moveChild(self, index+nPos)
+
+    def moveChild(self, child, index):
+        '''move self or a child to a given index position'''
+        if child==self:
+            p = self.parent()
+        else:
+            p = self
+        if index < 0 or index > len(p.childs)-1:
+            return
+        p.removeChild(child)
+        p.insertChild(index,child)
+        p.sigMoved.emit(self, child, index)
 
     def parentChanged(self, parent):
         """This method is called when the parameter's parent has changed.
