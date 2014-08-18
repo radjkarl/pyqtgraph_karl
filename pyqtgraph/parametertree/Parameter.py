@@ -458,9 +458,9 @@ class Parameter(QtCore.QObject):
             return ParameterItem(self, depth=depth)
 
 
-    def addChild(self, child):
+    def addChild(self, child, duplicate=False):
         """Add another parameter to the end of this parameter's child list."""
-        return self.insertChild(len(self.childs), child)
+        return self.insertChild(len(self.childs), child, duplicate)
 
     def addChildren(self, children):
         ## If children was specified as dict, then assume keys are the names.
@@ -478,7 +478,7 @@ class Parameter(QtCore.QObject):
             self.addChild(chOpts)
         
         
-    def insertChild(self, pos, child):
+    def insertChild(self, pos, child, duplicate=False):
         """
         Insert a new child at pos.
         If pos is a Parameter, then insert at the position of that Parameter.
@@ -499,13 +499,13 @@ class Parameter(QtCore.QObject):
             pos = self.childs.index(pos)
             
         with self.treeChangeBlocker():
-            if child.parent() is not None:
+            if child.parent() is not None and not duplicate:
                 child.remove()
                 
             self.names[name] = child
             self.childs.insert(pos, child)
-            
-            child.parentChanged(self)
+            if not duplicate:
+                child.parentChanged(self)
             self.sigChildAdded.emit(self, child, pos)
             child.sigTreeStateChanged.connect(self.treeStateChanged)
         return child
@@ -555,10 +555,8 @@ class Parameter(QtCore.QObject):
         if index_new < 0 or index_new > len(p.childs)-1:
             return
         index_old = p.childs.index(child)
-        #is_expanded = child.items[0].isExpanded()
         p.removeChild(child)
         p.insertChild(index_new,child)
-        #child.item.setExpanded(is_expanded)
         child.sigMoved.emit(self, index_old, index_new)
 
     def parentChanged(self, parent):
