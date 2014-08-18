@@ -135,6 +135,9 @@ class Parameter(QtCore.QObject):
         expanded                     If True, the Parameter will appear expanded when
                                      displayed in a ParameterTree (its children will be
                                      visible). (default=True)
+        movable                      Allow drag/and drop. See example XXX to more information
+        sliding                      Allow change of position of parameters within the same 
+                                     hierarchy level
         =======================      =========================================================
         """
         
@@ -543,17 +546,20 @@ class Parameter(QtCore.QObject):
             index = p.childs.index(self)
             self.moveChild(self, index+nPos)
 
-    def moveChild(self, child, index):
+    def moveChild(self, child, index_new):
         '''move self or a child to a given index position'''
         if child==self:
             p = self.parent()
         else:
             p = self
-        if index < 0 or index > len(p.childs)-1:
+        if index_new < 0 or index_new > len(p.childs)-1:
             return
+        index_old = p.childs.index(child)
+        #is_expanded = child.items[0].isExpanded()
         p.removeChild(child)
-        p.insertChild(index,child)
-        p.sigMoved.emit(self, child, index)
+        p.insertChild(index_new,child)
+        #child.item.setExpanded(is_expanded)
+        child.sigMoved.emit(self, index_old, index_new)
 
     def parentChanged(self, parent):
         """This method is called when the parameter's parent has changed.

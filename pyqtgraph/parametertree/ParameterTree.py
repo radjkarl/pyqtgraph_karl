@@ -30,6 +30,9 @@ class ParameterTree(TreeWidget):
         self.itemChanged.connect(self.itemChangedEvent)
         self.lastSel = None
         self.setRootIsDecorated(False)
+        #inform parameter when expanded or collapsed by user: 
+        self.itemExpanded.connect(lambda item: item.param.opts.__setitem__ ('expanded',True))
+        self.itemCollapsed.connect(lambda item: item.param.opts.__setitem__ ('expanded',False))
         
     def setParameters(self, param, showTop=True):
         """
