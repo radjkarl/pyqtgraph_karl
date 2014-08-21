@@ -18,6 +18,7 @@ class AxisItem(GraphicsWidget):
     """
     sigLabelChanged = QtCore.Signal(object, object, object, object)#text, unit, prefix, args
     sigRangeChanged = QtCore.Signal(object, object)#mn, mx
+    #sigCopied = QtCore.Signal(object, object) #this axis, copied axis
 
     
     def __init__(self, orientation, pen=None, linkView=None, parent=None, maxTickLength=-5, showValues=True):
@@ -103,7 +104,16 @@ class AxisItem(GraphicsWidget):
         self.update()
 
 
-    def newLinkedAxis(self, orientation=None, **kwargs):
+    def clone(self, orientation=None, **kwargs):
+        """
+        clone this axis. the new axis will behave like the origin. 
+        """
+        axis = self.copy(orientation, kwargs)
+        self.sigLabelChanged.connect(axis.setLabel)
+        self.sigRangeChanged.connect(axis.setRange)
+        return axis
+
+    def copy(self, orientation=None, **kwargs):
         """
         Return a new axis sharing the same name and range (more attributes following...)
         """
@@ -113,8 +123,6 @@ class AxisItem(GraphicsWidget):
         if self.label.isVisible():
             axis.setLabel(self.labelText, self.labelUnits, self.labelUnitPrefix, **self.labelStyle)
         axis.setRange(*self.range)
-        self.sigLabelChanged.connect(axis.setLabel)
-        self.sigRangeChanged.connect(axis.setRange)
         return axis
 
 
