@@ -351,14 +351,10 @@ class ImageView(QtGui.QWidget):
         text_old = a.labelText
         a.setLabel(text, **kwargs)
         if not text_old and text:
-            # increase with of histogram
-            self.ui.gridLayout.setColumnMinimumWidth (1, 
-                self.ui.gridLayout.columnMinimumWidth(1)+130)
+            self.ui.histogram.setMinimumWidth(135)
         elif text_old and text == '':
             a.showLabel(False)
-            # decrease with of histogram
-            self.ui.gridLayout.setColumnMinimumWidth (1, 
-                self.ui.gridLayout.columnMinimumWidth(1)-130)
+            self.ui.histogram.setMinimumWidth(95)
 
     def autoRange(self):
         """Auto scale and pan the view around the image such that the image fills the view."""
