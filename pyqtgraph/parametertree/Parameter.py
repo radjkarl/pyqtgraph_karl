@@ -45,7 +45,7 @@ class Parameter(QtCore.QObject):
     sigValueChanging(self, value)        Emitted immediately for all value changes, 
                                          including during editing.
     sigChildAdded(self, child, index)    Emitted when a child is added
-    sigChildRemoved(self, child)         Emitted when a child is removed
+    sigChildRemoved(self, child, index)  Emitted when a child is removed
     sigParentChanged(self, parent)       Emitted when this parameter's parent has changed
     sigLimitsChanged(self, limits)       Emitted when this parameter's limits have changed
     sigDefaultChanged(self, default)     Emitted when this parameter's default value has changed
@@ -61,7 +61,7 @@ class Parameter(QtCore.QObject):
     sigValueChanging = QtCore.Signal(object, object)  ## self, value  emitted as value is being edited
     
     sigChildAdded = QtCore.Signal(object, object, object)  ## self, child, index
-    sigChildRemoved = QtCore.Signal(object, object)  ## self, child
+    sigChildRemoved = QtCore.Signal(object, object, object)  ## self, child, index
     sigParentChanged = QtCore.Signal(object, object)  ## self, parent
     sigLimitsChanged = QtCore.Signal(object, object)  ## self, limits
     sigDefaultChanged = QtCore.Signal(object, object)  ## self, default
@@ -516,9 +516,10 @@ class Parameter(QtCore.QObject):
         if name not in self.names or self.names[name] is not child:
             raise Exception("Parameter %s is not my child; can't remove." % str(child))
         del self.names[name]
-        self.childs.pop(self.childs.index(child))
+        index = self.childs.index(child)
+        self.childs.pop(index)
         child.parentChanged(None)
-        self.sigChildRemoved.emit(self, child)
+        self.sigChildRemoved.emit(self, child, index)
         try:
             child.sigTreeStateChanged.disconnect(self.treeStateChanged)
         except (TypeError, RuntimeError):  ## already disconnected
