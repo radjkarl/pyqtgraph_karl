@@ -51,7 +51,6 @@ class Parameter(QtCore.QObject):
     sigDefaultChanged(self, default)     Emitted when this parameter's default value has changed
     sigNameChanged(self, name)           Emitted when this parameter's name has changed
     sigOptionsChanged(self, opts)        Emitted when any of this parameter's options have changed
-    sigMoved(self, child, index)         Emitted if a child is moved to another position
     ===================================  =========================================================
     """
     ## name, type, limits, etc.
@@ -67,7 +66,6 @@ class Parameter(QtCore.QObject):
     sigDefaultChanged = QtCore.Signal(object, object)  ## self, default
     sigNameChanged = QtCore.Signal(object, object)  ## self, name
     sigOptionsChanged = QtCore.Signal(object, object)  ## self, {opt:val, ...}
-    sigMoved = QtCore.Signal(object, object, int) ## self, child, index
     
     ## Emitted when anything changes about this parameter at all.
     ## The second argument is a string indicating what changed ('value', 'childAdded', etc..)
@@ -555,12 +553,7 @@ class Parameter(QtCore.QObject):
             p = self
         if index_new < 0 or index_new > len(p.childs)-1:
             return
-        index_old = p.childs.index(child)
-        p.blockSignals(True)
-        p.removeChild(child)
         p.insertChild(index_new,child)
-        p.blockSignals(False)
-        child.sigMoved.emit(self, index_old, index_new)
 
     def parentChanged(self, parent):
         """This method is called when the parameter's parent has changed.
