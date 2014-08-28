@@ -26,7 +26,7 @@ class Parameter(QtCore.QObject):
     
     Note: It is fairly uncommon to use the Parameter class directly; mostly you 
     will use subclasses which provide specialized type and data handling. The static
-    pethod Parameter.create(...) is an easy way to generate instances of these subclasses.
+    method Parameter.create(...) is an easy way to generate instances of these subclasses.
        
     For more Parameter types, see ParameterTree.parameterTypes module.
     
