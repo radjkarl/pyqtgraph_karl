@@ -556,8 +556,10 @@ class Parameter(QtCore.QObject):
         if index_new < 0 or index_new > len(p.childs)-1:
             return
         index_old = p.childs.index(child)
+        p.blockSignals(True)
         p.removeChild(child)
         p.insertChild(index_new,child)
+        p.blockSignals(False)
         child.sigMoved.emit(self, index_old, index_new)
 
     def parentChanged(self, parent):
