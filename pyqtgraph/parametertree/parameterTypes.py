@@ -176,6 +176,9 @@ class WidgetParameterItem(ParameterItem):
             l = opts.get('limits')
             if l:
                 w.setRange(*l)
+            v = opts.get('value')
+            if l:
+                w.setValue(v)
             #w.value = w.colorMap
             #w.setValue = w.setColorMap
             self.hideWidget = False
