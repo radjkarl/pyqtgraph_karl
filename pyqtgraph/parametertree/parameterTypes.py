@@ -27,6 +27,7 @@ class WidgetParameterItem(ParameterItem):
     str                         Displays a QLineEdit
     color                       Displays a :class:`ColorButton <pyqtgraph.ColorButton>`
     colormap                    Displays a :class:`GradientWidget <pyqtgraph.GradientWidget>`
+    slider                      Displays a :class:`SliderWidget <pyqtgraph.SliderWidget>`.
     ==========================  =============================================================
     
     This class can be subclassed by overriding makeWidget() to provide a custom widget.
@@ -166,6 +167,17 @@ class WidgetParameterItem(ParameterItem):
             w.sigChanging = w.sigGradientChanged
             w.value = w.colorMap
             w.setValue = w.setColorMap
+            self.hideWidget = False
+        elif t == 'slider':
+            from ..widgets.SliderWidget import SliderWidget
+            w = SliderWidget()
+            w.sigChanged = w.sigValueChanged
+            w.sigChanging = w.sigValueChanged
+            l = opts.get('limits')
+            if l:
+                w.setRange(*l)
+            #w.value = w.colorMap
+            #w.setValue = w.setColorMap
             self.hideWidget = False
         else:
             raise Exception("Unknown type '%s'" % asUnicode(t))
@@ -344,6 +356,7 @@ registerParameterType('bool', SimpleParameter, override=True)
 registerParameterType('str', SimpleParameter, override=True)
 registerParameterType('color', SimpleParameter, override=True)
 registerParameterType('colormap', SimpleParameter, override=True)
+registerParameterType('slider', SimpleParameter, override=True)
 
 
 
