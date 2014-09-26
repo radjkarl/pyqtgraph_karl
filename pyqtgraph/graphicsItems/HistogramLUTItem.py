@@ -64,6 +64,7 @@ class HistogramLUTItem(GraphicsWidget):
         self.layout.addItem(self.vb, 0, 1)
         self.layout.addItem(self.gradient, 0, 2)
         self.range = None
+        self.linkedHistograms = {}
         self.gradient.setFlag(self.gradient.ItemStacksBehindParent)
         self.vb.setFlag(self.gradient.ItemStacksBehindParent)
         
@@ -203,3 +204,15 @@ class HistogramLUTItem(GraphicsWidget):
         
     def setLevels(self, mn, mx):
         self.region.setRegion([mn, mx])
+
+    def linkHistogram(self, slaveHistogram, connect=True):
+        if connect:
+            fn = lambda h, slave=slaveHistogram:slave.setLevels(*h.getLevels())
+            self.linkedHistograms[id(slaveHistogram)] = fn
+            self.sigLevelsChanged.connect(fn)
+            self.sigLevelsChanged.emit(self)
+            #self.vb.setYLink(slaveHistogram.vb)
+        else:
+            fn = self.linkedHistograms.get(id(slaveHistogram), None)
+            if fn:
+                self.sigLevelsChanged.disconnect(fn)

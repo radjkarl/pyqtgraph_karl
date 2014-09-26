@@ -382,6 +382,7 @@ class GradientEditorItem(TickSliderItem):
         self.backgroundRect = QtGui.QGraphicsRectItem(QtCore.QRectF(0, -self.rectSize, 100, self.rectSize))
         self.backgroundRect.setBrush(QtGui.QBrush(QtCore.Qt.DiagCrossPattern))
         self.colorMode = 'rgb'
+        self.linkedGradients = {}
         
         TickSliderItem.__init__(self, *args, **kargs)
         
@@ -781,7 +782,18 @@ class GradientEditorItem(TickSliderItem):
         self.updateGradient()
         self.sigGradientChangeFinished.emit(self)
 
-        
+    def linkGradient(self, slaveGradient, connect=True):
+        if connect:
+            fn = lambda g, slave=slaveGradient:slave.restoreState(g.saveState())
+            self.linkedGradients[id(slaveGradient)] = fn
+            self.sigGradientChanged.connect(fn)
+            self.sigGradientChanged.emit(self)
+        else:
+            fn = self.linkedGradients.get(id(slaveGradient), None)
+            if fn:
+                self.sigGradientChanged.disconnect(fn)
+
+
 class Tick(QtGui.QGraphicsObject):  ## NOTE: Making this a subclass of GraphicsObject instead results in 
                                     ## activating this bug: https://bugreports.qt-project.org/browse/PYSIDE-86
     ## private class
