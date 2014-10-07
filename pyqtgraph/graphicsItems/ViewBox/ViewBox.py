@@ -1108,7 +1108,17 @@ class ViewBox(GraphicsWidget):
 
     def xInverted(self):
         return self.state['xInverted']
-        
+
+    def getAspectRatio(self):
+        '''return the current aspect ratio'''
+        rect = self.rect()
+        vr = self.viewRect()
+        if rect.height() == 0 or vr.width() == 0 or vr.height() == 0:
+            currentRatio = 1.0
+        else:
+            currentRatio = (rect.width()/float(rect.height())) / (vr.width()/vr.height())
+        return currentRatio
+ 
     def setAspectLocked(self, lock=True, ratio=1):
         """
         If the aspect ratio is locked, view scaling must always preserve the aspect ratio.
@@ -1121,12 +1131,7 @@ class ViewBox(GraphicsWidget):
                 return
             self.state['aspectLocked'] = False
         else:
-            rect = self.rect()
-            vr = self.viewRect()
-            if rect.height() == 0 or vr.width() == 0 or vr.height() == 0:
-                currentRatio = 1.0
-            else:
-                currentRatio = (rect.width()/float(rect.height())) / (vr.width()/vr.height())
+            currentRatio = self.getAspectRatio()
             if ratio is None:
                 ratio = currentRatio
             if self.state['aspectLocked'] == ratio: # nothing to change
