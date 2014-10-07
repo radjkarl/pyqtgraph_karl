@@ -36,10 +36,11 @@ class HistogramLUTItem(GraphicsWidget):
     sigLevelsChanged = QtCore.Signal(object)
     sigLevelChangeFinished = QtCore.Signal(object)
     
-    def __init__(self, image=None, fillHistogram=True):
+    def __init__(self, image=None, fillHistogram=True, gradientPosition='left'):
         """
         If *image* (ImageItem) is provided, then the control will be automatically linked to the image and changes to the control will be immediately reflected in the image's appearance.
         By default, the histogram is rendered with a fill. For performance, set *fillHistogram* = False.
+        gradientPosition -> 'left' OR 'right' / set to left to have a matplotlib-like layout
         """
         GraphicsWidget.__init__(self)
         self.lut = None
@@ -54,15 +55,17 @@ class HistogramLUTItem(GraphicsWidget):
         self.vb.setMinimumWidth(45)
         self.vb.setMouseEnabled(x=False, y=True)
         self.gradient = GradientEditorItem()
-        self.gradient.setOrientation('right')
+        o = 'left' if gradientPosition == 'right' else 'right'
+        self.gradient.setOrientation(o)
         self.gradient.loadPreset('grey')
         self.region = LinearRegionItem([0, 1], LinearRegionItem.Horizontal)
         self.region.setZValue(1000)
         self.vb.addItem(self.region)
-        self.axis = AxisItem('left', linkView=self.vb, maxTickLength=-10)
-        self.layout.addItem(self.axis, 0, 0)
+        self.axis = AxisItem('right', linkView=self.vb, maxTickLength=-10)
         self.layout.addItem(self.vb, 0, 1)
-        self.layout.addItem(self.gradient, 0, 2)
+        pos = (0,2) if gradientPosition == 'right' else (2,0)
+        self.layout.addItem(self.axis, 0, pos[0])
+        self.layout.addItem(self.gradient, 0, pos[1])
         self.range = None
         self.linkedHistograms = {}
         self.gradient.setFlag(self.gradient.ItemStacksBehindParent)
