@@ -88,7 +88,19 @@ class HistogramLUTItem(GraphicsWidget):
         if image is not None:
             self.setImageItem(image)
         #self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
-        
+
+#     def showHistogramPlot(self, show=True):
+#         if show:
+#             self.vb.setMinimumWidth(45)
+#             self.vb.show()
+#             self.setMinimumWidth(135)#setFixedWidth(self.size().width()+60)
+#         else:
+#             self.vb.hide()
+#             self.vb.setMinimumWidth(0)
+#             self.setMinimumWidth(2)#setFixedWidth(self.size().width()-60)
+#         self.update()       
+            
+  
     def fillHistogram(self, fill=True, level=0.0, color=(100, 100, 200)):
         if fill:
             self.plot.setFillLevel(level)
@@ -100,17 +112,18 @@ class HistogramLUTItem(GraphicsWidget):
         #return QtCore.QSizeF(115, 200)
         
     def paint(self, p, *args):
-        pen = self.region.lines[0].pen
-        rgn = self.getLevels()
-        p1 = self.vb.mapFromViewToItem(self, Point(self.vb.viewRect().center().x(), rgn[0]))
-        p2 = self.vb.mapFromViewToItem(self, Point(self.vb.viewRect().center().x(), rgn[1]))
-        gradRect = self.gradient.mapRectToParent(self.gradient.gradRect.rect())
-        for pen in [fn.mkPen('k', width=3), pen]:
-            p.setPen(pen)
-            p.drawLine(p1, gradRect.bottomLeft())
-            p.drawLine(p2, gradRect.topLeft())
-            p.drawLine(gradRect.topLeft(), gradRect.topRight())
-            p.drawLine(gradRect.bottomLeft(), gradRect.bottomRight())
+        if self.region.isVisible():
+            pen = self.region.lines[0].pen
+            rgn = self.getLevels()
+            p1 = self.vb.mapFromViewToItem(self, Point(self.vb.viewRect().center().x(), rgn[0]))
+            p2 = self.vb.mapFromViewToItem(self, Point(self.vb.viewRect().center().x(), rgn[1]))
+            gradRect = self.gradient.mapRectToParent(self.gradient.gradRect.rect())
+            for pen in [fn.mkPen('k', width=3), pen]:
+                p.setPen(pen)
+                p.drawLine(p1, gradRect.bottomLeft())
+                p.drawLine(p2, gradRect.topLeft())
+                p.drawLine(gradRect.topLeft(), gradRect.topRight())
+                p.drawLine(gradRect.bottomLeft(), gradRect.bottomRight())
         #p.drawRect(self.boundingRect())
         
         

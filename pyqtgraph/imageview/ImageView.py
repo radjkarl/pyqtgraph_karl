@@ -356,6 +356,31 @@ class ImageView(QtGui.QWidget):
             a.showLabel(False)
             self.ui.histogram.setMinimumWidth(95)
 
+    def showHistogramPlot(self, show=True):
+        '''for some season this method doesn't work when called in LUTHistogram directly
+        * show/hide histogram plot
+        * resize area <- TODO: works with static sizes, changes this!
+        if hide:
+        * set histogramAxis to current range
+        * disable mouseinteraction for histogramAxis
+        '''
+        h = self.ui.histogram
+        if show:
+            h.vb.setMinimumWidth(45)
+            h.vb.show()
+            h.setMinimumWidth(135)
+            h.vb.state['mouseEnabled'][1] = True
+        else:   
+            #fit range to axis
+            r = h.region.getRegion()
+            h.vb.setYRange(*r, padding=0)         
+            h.vb.hide()
+            h.vb.setMinimumWidth(0)
+            h.setFixedWidth(95)
+            h.vb.state['mouseEnabled'][1] = False
+        h.update()   
+
+
     def autoRange(self):
         """Auto scale and pan the view around the image such that the image fills the view."""
         image = self.getProcessedImage()
