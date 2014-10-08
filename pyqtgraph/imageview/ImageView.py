@@ -333,7 +333,18 @@ class ImageView(QtGui.QWidget):
         self.lastPlayTime = ptime.time()
         if not self.playTimer.isActive():
             self.playTimer.start(16)
-            
+
+    def enableAutoLevels(self, enable=True):
+        '''
+        enable/disable autoleveling for setImage
+        '''
+        if enable:
+            if hasattr(self, '_autoLevels'):
+                self.autoLevels = self._autoLevels
+        else:
+            self._autoLevels = self.autoLevels
+            self.autoLevels = lambda: None
+        
     def autoLevels(self):
         """Set the min/max intensity levels automatically to match the image data."""
         self.setLevels(self.levelMin, self.levelMax)
@@ -356,8 +367,10 @@ class ImageView(QtGui.QWidget):
             a.showLabel(False)
             self.ui.histogram.setMinimumWidth(95)
 
-    def showHistogramPlot(self, show=True):
-        '''for some season this method doesn't work when called in LUTHistogram directly
+    def setHistogramPrintView(self, printView=True):
+        '''
+        transforms the histogram into a more common shape to export the image
+        for some season this method doesn't work when called in LUTHistogram directly
         * show/hide histogram plot
         * resize area <- TODO: works with static sizes, changes this!
         if hide:
@@ -365,12 +378,7 @@ class ImageView(QtGui.QWidget):
         * disable mouseinteraction for histogramAxis
         '''
         h = self.ui.histogram
-        if show:
-            h.vb.setMinimumWidth(45)
-            h.vb.show()
-            h.setMinimumWidth(135)
-            h.vb.state['mouseEnabled'][1] = True
-        else:   
+        if printView:
             #fit range to axis
             r = h.region.getRegion()
             h.vb.setYRange(*r, padding=0)         
@@ -378,6 +386,12 @@ class ImageView(QtGui.QWidget):
             h.vb.setMinimumWidth(0)
             h.setFixedWidth(95)
             h.vb.state['mouseEnabled'][1] = False
+        else:   
+            h.vb.setMinimumWidth(45)
+            h.vb.show()
+            h.setMinimumWidth(135)
+            h.vb.state['mouseEnabled'][1] = True     
+        h.gradient.showTicks(not printView)
         h.update()   
 
 

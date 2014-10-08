@@ -405,10 +405,10 @@ class GradientEditorItem(TickSliderItem):
         self.hsvAction = QtGui.QAction('HSV', self)
         self.hsvAction.setCheckable(True)
         self.hsvAction.triggered.connect(lambda: self.setColorMode('hsv'))
-        self.showTickAction = QtGui.QAction('show ticks', self)
-        self.showTickAction.setCheckable(True)
-        self.showTickAction.setChecked(True)        
-        self.showTickAction.triggered.connect(self.showTicks)
+#         self.showTickAction = QtGui.QAction('show ticks', self)
+#         self.showTickAction.setCheckable(True)
+#         self.showTickAction.setChecked(True)        
+#         self.showTickAction.triggered.connect(self.showTicks)
             
         self.menu = QtGui.QMenu()
         
@@ -436,7 +436,7 @@ class GradientEditorItem(TickSliderItem):
         self.menu.addSeparator()
         self.menu.addAction(self.rgbAction)
         self.menu.addAction(self.hsvAction)
-        self.menu.addAction(self.showTickAction)
+        #self.menu.addAction(self.showTickAction)
 
         
         for t in list(self.ticks.keys()):
@@ -759,7 +759,7 @@ class GradientEditorItem(TickSliderItem):
         for t in self.ticks:
             c = t.color
             ticks.append((self.ticks[t], (c.red(), c.green(), c.blue(), c.alpha())))
-        state = {'mode': self.colorMode, 'ticks': ticks, 'ticksVisible':self.showTickAction.isChecked()}
+        state = {'mode': self.colorMode, 'ticks': ticks, 'ticksVisible':self.ticks.keys()[0].isVisible()}
         return state
         
     def restoreState(self, state):
@@ -784,7 +784,7 @@ class GradientEditorItem(TickSliderItem):
         for t in state['ticks']:
             c = QtGui.QColor(*t[1])
             self.addTick(t[0], c, finish=False)
-        self.showTicks( state.get('ticksVisible', self.showTickAction.isChecked()) )
+        self.showTicks( state.get('ticksVisible', self.ticks.keys()[0].isVisible()) )
         self.updateGradient()
         self.sigGradientChangeFinished.emit(self)
         
