@@ -38,6 +38,7 @@ class AxisItem(GraphicsWidget):
         GraphicsWidget.__init__(self, parent)
         self.label = QtGui.QGraphicsTextItem(self)
         self.picture = None
+        self.orientation = None
         self.setOrientation(orientation)
             
         self.style = {
@@ -81,7 +82,7 @@ class AxisItem(GraphicsWidget):
             self.setPen()
         else:
             self.setPen(pen)
-        
+            
         self._linkedView = None
         if linkView is not None:
             self.linkToView(linkView)
@@ -96,12 +97,16 @@ class AxisItem(GraphicsWidget):
         """
         orientation = 'left', 'right', 'top', 'bottom'
         """
-        if orientation not in ['left', 'right', 'top', 'bottom']:
-            raise Exception("Orientation argument must be one of 'left', 'right', 'top', or 'bottom'.")
-        if orientation in ['left', 'right']:
-            self.label.rotate(-90)
-        self.orientation = orientation
-        self.update()
+        if orientation != self.orientation:
+            if orientation not in ['left', 'right', 'top', 'bottom']:
+                raise Exception("Orientation argument must be one of 'left', 'right', 'top', or 'bottom'.")
+            #rotate absolute allows to change orientation multiple times:
+            if orientation in ['left', 'right']:
+                self.label.setRotation(-90)
+            else:
+                self.label.setRotation(0) 
+            self.orientation = orientation
+            self.update()
 
 
     def clone(self, orientation=None, **kwargs):
@@ -340,7 +345,7 @@ class AxisItem(GraphicsWidget):
                     self.setHeight()
                     #return True  ## size has changed
         
-    def _adjustSize(self):
+    def _adjustSize(self):      
         if self.orientation in ['left', 'right']:
             self.setWidth()
         else:
@@ -360,6 +365,8 @@ class AxisItem(GraphicsWidget):
             h += max(0, self.style['tickLength'])
             if self.label.isVisible():
                 h += self.label.boundingRect().height() * 0.8
+        self.setMinimumWidth(-1)#reset, if limited before...
+        self.setMaximumWidth(-1) 
         self.setMaximumHeight(h)
         self.setMinimumHeight(h)
         self.picture = None
@@ -378,6 +385,8 @@ class AxisItem(GraphicsWidget):
             w += max(0, self.style['tickLength'])
             if self.label.isVisible():
                 w += self.label.boundingRect().height() * 0.8  ## bounding rect is usually an overestimate
+        self.setMinimumHeight(-1)#reset, if limited before...
+        self.setMaximumHeight(-1) 
         self.setMaximumWidth(w)
         self.setMinimumWidth(w)
         self.picture = None
@@ -478,13 +487,21 @@ class AxisItem(GraphicsWidget):
         """Link this axis to a ViewBox, causing its displayed range to match the visible range of the view."""
         oldView = self.linkedView()
         self._linkedView = weakref.ref(view)
-        if self.orientation in ['right', 'left']:
-            if oldView is not None:# and oldView != view:
+        
+        if oldView is not None:
+            #orientation of axis in oldview unknown, so:
+            try:
                 oldView.sigYRangeChanged.disconnect(self.linkedViewChanged)
+            except TypeError:
+                oldView.sigXRangeChanged.disconnect(self.linkedViewChanged)
+        
+        if self.orientation in ['right', 'left']:
+            #if oldView is not None:# and oldView != view:
+            #    oldView.sigYRangeChanged.disconnect(self.linkedViewChanged)
             view.sigYRangeChanged.connect(self.linkedViewChanged)
         else:
-            if oldView is not None:# and oldView != view:
-                oldView.sigXRangeChanged.disconnect(self.linkedViewChanged)
+            #if oldView is not None:# and oldView != view:
+           #     oldView.sigXRangeChanged.disconnect(self.linkedViewChanged)
             view.sigXRangeChanged.connect(self.linkedViewChanged)
         
         if oldView is not None:

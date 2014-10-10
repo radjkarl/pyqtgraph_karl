@@ -252,11 +252,6 @@ class PlotItem(GraphicsWidget):
         self.ctrl.maxTracesCheck.toggled.connect(self.updateDecimation)
         self.ctrl.maxTracesSpin.valueChanged.connect(self.updateDecimation)
         
-        self.hideAxis('right')
-        self.hideAxis('top')
-        self.showAxis('left')
-        self.showAxis('bottom')
-        
         if labels is None:
             labels = {}
         for label in list(self.axes.keys()):
@@ -284,13 +279,21 @@ class PlotItem(GraphicsWidget):
             axisItems = {}
         self.axes = {}
         for k, pos in (('top', (1,1)), ('bottom', (3,1)), ('left', (2,0)), ('right', (2,2))):
-            axis = axisItems.get(k, AxisItem(orientation=k))
+            axis = axisItems.get(k, None)
+            if axis:
+                axis.setOrientation(k)
+            else:
+                axis = AxisItem(orientation=k)
             axis.linkToView(self.vb)
             self.axes[k] = {'item': axis, 'pos': pos}
             self.layout.addItem(axis, *pos)
             axis.setZValue(-1000)
             axis.setFlag(axis.ItemNegativeZStacksBehindParent)
- 
+            
+        self.hideAxis('right')
+        self.hideAxis('top')
+        self.showAxis('left')
+        self.showAxis('bottom')
         
     def implements(self, interface=None):
         return interface in ['ViewBoxWrapper']
