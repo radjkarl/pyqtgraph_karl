@@ -116,7 +116,9 @@ class ImageView(QtGui.QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         self.scene = self.ui.graphicsView.scene()
-        
+
+        self.opts = {'autoLevels':True, 'autoRange':True, 'autoHistogramRange':True, 'discreteTimeLine':False}
+
         self.ignoreTimeLine = False
         
         if view is None:
@@ -195,7 +197,7 @@ class ImageView(QtGui.QWidget):
         
         self.roiClicked() ## initialize roi plot to correct shape / visibility
 
-    def setImage(self, img, autoRange=True, autoLevels=True, levels=None, axes=None, xvals=None, pos=None, scale=None, transform=None, autoHistogramRange=True):
+    def setImage(self, img, autoRange=None, autoLevels=None, levels=None, axes=None, xvals=None, pos=None, scale=None, transform=None, autoHistogramRange=True):
         """
         Set the image to be displayed in the widget.
         
@@ -221,7 +223,12 @@ class ImageView(QtGui.QWidget):
         ================== =======================================================================
         """
         profiler = debug.Profiler()
-        
+
+        if autoLevels == None:
+            autoLevels = self.opts['autoLevels']
+        if autoRange == None:
+            autoRange = self.opts['autoRange']
+
         if hasattr(img, 'implements') and img.implements('MetaArray'):
             img = img.asarray()
         
@@ -275,6 +282,7 @@ class ImageView(QtGui.QWidget):
 
         self.currentIndex = 0
         self.updateImage(autoHistogramRange=autoHistogramRange)
+
         if levels is None and autoLevels:
             self.autoLevels()
         if levels is not None:  ## this does nothing since getProcessedImage sets these values again.
@@ -334,17 +342,15 @@ class ImageView(QtGui.QWidget):
         if not self.playTimer.isActive():
             self.playTimer.start(16)
 
-    def enableAutoLevels(self, enable=True):
+    def setOpts(self, **opts):
         '''
-        enable/disable autoleveling for setImage
+        change defaults view options, like:
+        autoRange = [True, False]
+        autoLevels = [True, False]
+        discreteTimeSteps = [True, False]
         '''
-        if enable:
-            if hasattr(self, '_autoLevels'):
-                self.autoLevels = self._autoLevels
-        else:
-            self._autoLevels = self.autoLevels
-            self.autoLevels = lambda: None
-        
+        self.opts.update(opts)
+ 
     def autoLevels(self):
         """Set the min/max intensity levels automatically to match the image data."""
         self.setLevels(self.levelMin, self.levelMax)
@@ -671,13 +677,21 @@ class ImageView(QtGui.QWidget):
             self.updateImage()
         #self.timeLine.setPos(time)
         #self.emit(QtCore.SIGNAL('timeChanged'), ind, time)
+        if self.opts['discreteTimeSteps']:
+            self.timeLine.sigPositionChanged.disconnect(self.timeLineChanged)
+            self.timeLine.setPos(self.currentIndex)
+            self.timeLine.sigPositionChanged.connect(self.timeLineChanged)
+
         self.sigTimeChanged.emit(ind, time)
 
-    def updateImage(self, autoHistogramRange=True):
+    def updateImage(self, autoHistogramRange=None):
         ## Redraw image on screen
         if self.image is None:
             return
-            
+        
+        if autoHistogramRange == None:
+            autoHistogramRange = self.opts['autoHistogramRange']
+        
         image = self.getProcessedImage()
         
         if autoHistogramRange:
