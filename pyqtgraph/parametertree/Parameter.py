@@ -136,6 +136,8 @@ class Parameter(QtCore.QObject):
         movable                      Allow drag/and drop. See example XXX to more information
         sliding                      Allow change of position of parameters within the same 
                                      hierarchy level
+        addToContextMenu             List of QMenu or QAction instances to add to the context 
+                                     menu
         =======================      =========================================================
         """
         
@@ -553,7 +555,9 @@ class Parameter(QtCore.QObject):
             p = self
         if index_new < 0 or index_new > len(p.childs)-1:
             return
+        p.opts['aboutToMove'] = True
         p.insertChild(index_new,child)
+        p.opts['aboutToMove'] = False
 
     def parentChanged(self, parent):
         """This method is called when the parameter's parent has changed.

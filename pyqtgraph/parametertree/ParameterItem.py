@@ -42,7 +42,14 @@ class ParameterItem(QtGui.QTreeWidgetItem):
             self.contextMenu.addAction('Rename').triggered.connect(self.editName)
         if opts.get('removable', False):
             self.contextMenu.addAction("Remove").triggered.connect(self.requestRemove)
-        
+        menuitems = opts.get('addToContextMenu', [])
+        for i in menuitems:
+            if isinstance(i, QtGui.QMenu):
+                self.contextMenu.addMenu(i)
+            elif isinstance(i, QtGui.QAction):
+                self.contextMenu.addAction(i)
+            else:
+                raise AttributeError('need either QMenu or QAction instances to add to the context menu')
         ## handle movable / dropEnabled options
         if opts.get('movable', False):
             flags |= QtCore.Qt.ItemIsDragEnabled
