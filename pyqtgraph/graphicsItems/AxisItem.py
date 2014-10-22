@@ -130,6 +130,28 @@ class AxisItem(GraphicsWidget):
         axis.setRange(*self.range)
         return axis
 
+    def setFontSize(self, ptSize):
+        '''
+        change the size of the label, ticks and tickValues proportional
+        '''
+        #change label size
+        self.labelStyle['font-size'] = '%spt' %ptSize
+        self.setLabel(self.labelText, self.labelUnits,**self.labelStyle)
+        
+        if not self.orientation in ['left', 'right']:
+            txtoffs =  int(5.0/9*ptSize)
+        else:
+            txtoffs = int(2.0/9*ptSize)
+        #change ticks sizes and tickValue distances
+        self.setStyle(tickLength=-int(ptSize*0.7),
+                      tickTextOffset=txtoffs,
+                      tickTextWidth=int(30.0/9*ptSize),
+                      tickTextHeight=int(18.0/9*ptSize))
+        #change tickValue size
+        if self.tickFont == None:
+            tickFont = QtGui.QPainter().font()
+            self.setTickFont(tickFont)
+        self.tickFont.setPointSizeF(ptSize*0.9)
 
     def setStyle(self, **kwds):
         """
