@@ -14,8 +14,9 @@ class Dock(QtGui.QWidget, DockDrop):
     sigMaximized = QtCore.Signal()
     
     def __init__(self, name, area=None, size=(10, 10), widget=None, hideTitle=False, 
-                 #ALTERNATIVE: option whether Dock controls (min,max,close) or not
-                 autoOrientation=True, closable=False, minimizable=True, maximizable=True):
+                 autoOrientation=True,
+                 #TODO: general option whether Dock controls (min,max,close) or not: 
+                 closable=False, minimizable=True, maximizable=True):
         QtGui.QWidget.__init__(self)
         DockDrop.__init__(self)
         self.area = area
@@ -29,7 +30,6 @@ class Dock(QtGui.QWidget, DockDrop):
         if maximizable:
             self.label.sigMaxClicked.connect(self.maximize)
             self.label.sigDeMaxClicked.connect(self.deMaximize)
-
 
         self.labelHidden = False
         self.moveLabel = True  ## If false, the dock is no longer allowed to move the label.
@@ -88,6 +88,19 @@ class Dock(QtGui.QWidget, DockDrop):
 
         if hideTitle:
             self.hideTitleBar()
+
+    def checkShowControls(self):
+        '''
+        decide whether to show/hide the min- and max-button in the title bar
+        ''' 
+        #hide dock.label.controls if only on dock is in area
+        if len(self.area.docks) == 1:
+            lastDock = self.area.docks.values()[0]
+            lastDock.label.showControls(False)
+        #show label.controls if when second dock is added
+        elif len(self.area.docks) == 2:
+            for dock in self.area.docks.values():
+                dock.label.showControls()
 
     def implements(self, name=None):
         if name is None:
@@ -243,6 +256,12 @@ class Dock(QtGui.QWidget, DockDrop):
         self.label.setParent(None)
         self._container.apoptose()
         self._container = None
+        for key, value in self.area.docks.iteritems():
+            #have to iterate because the dock.name() can be different now
+            if value == self:
+                self.area.docks.pop(key)
+                break
+        self.checkShowControls()
 
 
     def minimize(self):       
@@ -361,6 +380,13 @@ class DockLabel(VerticalLabel):
             self.closeButton.clicked.connect(self.sigCloseClicked)
             self.closeButton.setIcon(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_TitleBarCloseButton))
 
+    def showControls(self, show=True):
+        if self.minButton:
+            self.minButton.show() if show else self.minButton.hide()
+        if self.maxButton:
+            self.maxButton.show() if show else self.maxButton.hide()
+        #if self.closeButton:
+        #    self.closeButton.show() if show else self.closeButton.hide()
 
     def minButtonSetIcon(self):
         if self.minimized:

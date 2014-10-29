@@ -36,7 +36,7 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
         self.layout.setContentsMargins(0,0,0,0)
         self.layout.setSpacing(0)
         self.setLayout(self.layout)
-        self.docks = weakref.WeakValueDictionary()
+        self.docks = {} #weakref.WeakValueDictionary() because dock.close() doesn't delete its reference in self.docks
         self.topContainer = None
         self.raiseOverlay()
         self.temporary = temporary
@@ -120,6 +120,7 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
         container.insert(dock, insertPos, neighbor)
         dock.area = self
         self.docks[dock.name()] = dock
+        dock.checkShowControls()
         
         return dock
         
