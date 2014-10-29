@@ -254,7 +254,8 @@ class Dock(QtGui.QWidget, DockDrop):
             self.label.toggleMaximize()
         self.setParent(None)
         self.label.setParent(None)
-        self._container.apoptose()
+        if self._container != self.area.topContainer:
+            self._container.apoptose()
         self._container = None
         for key, value in self.area.docks.iteritems():
             #have to iterate because the dock.name() can be different now

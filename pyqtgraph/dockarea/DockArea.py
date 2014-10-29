@@ -68,7 +68,6 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
             dock = Dock(**kwds)
 
         (position, relativeTo) = self._findGridPosition(position, relativeTo)
-        
         ## Determine the container to insert this dock into.
         ## If there is no neighbour, then the container is the top.
         if relativeTo is None or relativeTo is self:
@@ -118,6 +117,8 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
         }[position]
         #print "request insert", dock, insertPos, neighbor
         container.insert(dock, insertPos, neighbor)
+        #dock.show()
+        container.show()
         dock.area = self
         self.docks[dock.name()] = dock
         dock.checkShowControls()
