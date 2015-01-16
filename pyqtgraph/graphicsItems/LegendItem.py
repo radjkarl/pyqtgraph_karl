@@ -19,12 +19,12 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         legend.setParentItem(plotItem)
 
     """
-    def __init__(self, size=None, offset=None):
+    def __init__(self, size=None, offset=None, drawFrame=True):
         """
         ==============  ===============================================================
         **Arguments:**
         size            Specifies the fixed size (width, height) of the legend. If
-                        this argument is omitted, the legend will autimatically resize
+                        this argument is omitted, the legend will automatically resize
                         to fit its contents.
         offset          Specifies the offset position relative to the legend's parent.
                         Positive values offset from the left or top; negative values
@@ -44,6 +44,7 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         self.items = []
         self.size = size
         self.offset = offset
+        self.drawFrame = drawFrame
         if size is not None:
             self.setGeometry(QtCore.QRectF(0, 0, self.size[0], self.size[1]))
         
@@ -129,9 +130,10 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         return QtCore.QRectF(0, 0, self.width(), self.height())
     
     def paint(self, p, *args):
-        p.setPen(fn.mkPen(255,255,255,100))
-        p.setBrush(fn.mkBrush(100,100,100,50))
-        p.drawRect(self.boundingRect())
+        if self.drawFrame:
+            p.setPen(fn.mkPen(255,255,255,100))
+            p.setBrush(fn.mkBrush(100,100,100,50))
+            p.drawRect(self.boundingRect())
 
     def hoverEvent(self, ev):
         ev.acceptDrags(QtCore.Qt.LeftButton)
