@@ -45,8 +45,12 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         self.size = size
         self.offset = offset
         self.drawFrame = drawFrame
+        self.columnCount = 1
+        self.rowCount = 1
+        self.curRow = 0
         if size is not None:
             self.setGeometry(QtCore.QRectF(0, 0, self.size[0], self.size[1]))
+
         
     def setParentItem(self, p):
         ret = GraphicsWidget.setParentItem(self, p)
@@ -76,13 +80,42 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
             sample = item
         else:
             sample = ItemSample(item)        
-        row = self.layout.rowCount()
         self.items.append((sample, label))
-        self.layout.addItem(sample, row, 0)
-        self.layout.addItem(label, row, 1)
+        self._addItemToLayout(sample, label)
         self.updateSize()
 
+    def _addItemToLayout(self, sample, label):
+        col = self.layout.columnCount()
+        row = self.layout.rowCount()
+        if row:
+            row -= 1
+        nCol = self.columnCount*2
+        #FIRST ROW FULL
+        if self.layout.columnCount() == self.columnCount*2:
+            for col in range(0,nCol+2,2):
+                #FIND RIGHT COLUMN
+                if not self.layout.itemAt(row, col):
+                    break
+            if col == nCol:
+                #MAKE NEW ROW
+                col = 0
+                row += 1
+        self.layout.addItem(sample, row, col)
+        self.layout.addItem(label, row, col+1)
 
+    def setColumnCount(self, columnCount):
+        '''
+        change the orientation of all items of the legend 
+        '''
+        if columnCount != self.columnCount:
+            self.columnCount = columnCount
+            self.rowCount = int(len(self.items)/columnCount)
+            for i in range(self.layout.count()-1,-1,-1):
+                self.layout.removeAt(i)  #clear layout
+            for sample, label in self.items:
+                self._addItemToLayout(sample, label) 
+            self.updateSize()
+        
     def getLabel(self, plotItem):
         """
         return the labelItem inside the legend for a given plotItem
@@ -114,17 +147,20 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
 
     def updateSize(self):
         if self.size is not None:
-            return
-            
+            return   
         height = 0
         width = 0
-        #print("-------")
-        for sample, label in self.items:
-            height += max(sample.height(), label.height()) + 3
-            width = max(width, sample.width()+label.width())
-            #print(width, height)
-        #print width, height
-        self.setGeometry(0, 0, width+25, height)
+        for row in range(self.layout.rowCount()):
+            row_height = 0 
+            col_witdh = 0
+            for col in range(self.layout.columnCount()):
+                item = self.layout.itemAt(row, col)
+                if item:
+                    col_witdh += item.width() + 3
+                    row_height = max(row_height, item.height())
+            width = max(width, col_witdh)
+            height += row_height
+        self.setGeometry(0, 0, width, height)
     
     def boundingRect(self):
         return QtCore.QRectF(0, 0, self.width(), self.height())
