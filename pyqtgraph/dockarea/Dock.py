@@ -333,9 +333,9 @@ class Dock(QtGui.QWidget, DockDrop):
 
     def dropEvent(self, *args):
         dock = args[0].source() 
-        #maximize the source dock if it is minimized before the drop       
+        #restore the source dock if it is minimized before the drop    
         if dock.label.minimized:
-            dock.label.minClicked()
+            dock.label.toggleMinimize()
         DockDrop.dropEvent(self, *args)
 
 
