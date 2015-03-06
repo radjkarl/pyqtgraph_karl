@@ -21,7 +21,7 @@ class Dock(QtGui.QWidget, DockDrop):
         DockDrop.__init__(self)
         self.area = area
         self.label = DockLabel(name, self, closable, minimizable, maximizable)
-        
+          
         if closable:
             self.label.sigCloseClicked.connect(self.close)
         if minimizable:
@@ -88,6 +88,7 @@ class Dock(QtGui.QWidget, DockDrop):
 
         if hideTitle:
             self.hideTitleBar()
+
 
     def checkShowControls(self):
         '''
@@ -307,6 +308,7 @@ class Dock(QtGui.QWidget, DockDrop):
         for dock in self.area.docks.values():
             if dock != self:
                 dock.hide()
+        self.area.maximized_dock = self
 
 
     def deMaximize(self):
@@ -315,6 +317,7 @@ class Dock(QtGui.QWidget, DockDrop):
         for dock in self.area.docks.values():
             if dock != self and dock._container:#if not closed
                 dock.show()
+        self.area.maximized_dock = None
 
 
     def __repr__(self):

@@ -122,7 +122,12 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
         dock.area = self
         self.docks[dock.name()] = dock
         dock.checkShowControls()
-        
+
+        #adding a new dock means to restore a ramaining mazmized dock:
+        maxDock = getattr(self, 'maximized_dock', None) 
+        if maxDock:
+            maxDock.label.toggleMaximize()
+
         return dock
         
     def moveDock(self, dock, position, neighbor):
