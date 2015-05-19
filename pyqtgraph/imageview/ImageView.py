@@ -688,6 +688,7 @@ class ImageView(QtGui.QWidget):
         if ind != self.currentIndex:
             self.currentIndex = ind
             self.updateImage()
+            self.sigTimeChanged.emit(ind, time)
         #self.timeLine.setPos(time)
         #self.emit(QtCore.SIGNAL('timeChanged'), ind, time)
         if self.opts['discreteTimeSteps']:
@@ -695,7 +696,7 @@ class ImageView(QtGui.QWidget):
             self.timeLine.setPos(self.currentIndex)
             self.timeLine.sigPositionChanged.connect(self.timeLineChanged)
 
-        self.sigTimeChanged.emit(ind, time)
+        
 
     def updateImage(self, autoHistogramRange=None):
         ## Redraw image on screen
