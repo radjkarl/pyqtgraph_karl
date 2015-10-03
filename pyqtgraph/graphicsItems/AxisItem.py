@@ -18,6 +18,7 @@ class AxisItem(GraphicsWidget):
     """
     sigLabelChanged = QtCore.Signal(object, object, object, object)#text, unit, prefix, args
     sigRangeChanged = QtCore.Signal(object, object)#mn, mx
+    sigFontSizeChanged = QtCore.Signal(object) #fontSize
     #sigCopied = QtCore.Signal(object, object) #this axis, copied axis
 
     
@@ -146,12 +147,14 @@ class AxisItem(GraphicsWidget):
         self.setStyle(tickLength=-int(ptSize*0.7),
                       tickTextOffset=txtoffs,
                       tickTextWidth=int(30.0/9*ptSize),
-                      tickTextHeight=int(18.0/9*ptSize))
+                      tickTextHeight=int(18.0/9*ptSize),
+                      )
         #change tickValue size
         if self.tickFont == None:
             tickFont = QtGui.QPainter().font()
             self.setTickFont(tickFont)
         self.tickFont.setPointSizeF(ptSize*0.9)
+        self.sigFontSizeChanged.emit(ptSize)
 
     def setStyle(self, **kwds):
         """
@@ -221,8 +224,12 @@ class AxisItem(GraphicsWidget):
         self.update()
         
     def close(self):
-        self.sigLabelChanged.disconnect()
-        self.sigRangeChanged.disconnect()
+        try:
+            self.sigLabelChanged.disconnect()
+            self.sigRangeChanged.disconnect()
+        except TypeError:
+            #nothing connected
+            pass
         self.scene().removeItem(self.label)
         self.label = None
         self.scene().removeItem(self)
