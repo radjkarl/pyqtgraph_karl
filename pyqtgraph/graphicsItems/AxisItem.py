@@ -224,12 +224,12 @@ class AxisItem(GraphicsWidget):
         self.update()
         
     def close(self):
-        try:
-            self.sigLabelChanged.disconnect()
-            self.sigRangeChanged.disconnect()
-        except TypeError:
+       # try:
+        self.sigLabelChanged.disconnect()
+        self.sigRangeChanged.disconnect()
+        #except TypeError:
             #nothing connected
-            pass
+       #     pass
         self.scene().removeItem(self.label)
         self.label = None
         self.scene().removeItem(self)

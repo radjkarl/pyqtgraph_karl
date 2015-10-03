@@ -6,6 +6,8 @@ from ..python2_3 import asUnicode
 
 from Container import TContainer
 
+import weakref
+
 class Dock(QtGui.QWidget, DockDrop):
     
     sigStretchChanged = QtCore.Signal()
@@ -16,11 +18,11 @@ class Dock(QtGui.QWidget, DockDrop):
     def __init__(self, name, area=None, size=(10, 10), widget=None, hideTitle=False, 
                  autoOrientation=True,
                  #TODO: general option whether Dock controls (min,max,close) or not: 
-                 closable=False, minimizable=True, maximizable=True):
+                 closable=False, minimizable=False, maximizable=False):
         QtGui.QWidget.__init__(self)
         DockDrop.__init__(self)
         self.area = area
-        self.label = DockLabel(name, self, closable, minimizable, maximizable)
+        self.label = DockLabel(name, weakref.proxy(self), closable, minimizable, maximizable)
           
         if closable:
             self.label.sigCloseClicked.connect(self.close)
@@ -347,6 +349,7 @@ class DockLabel(VerticalLabel):
     
     sigClicked = QtCore.Signal(object, object)
     sigCloseClicked = QtCore.Signal()
+    #TODO: change to sigMaxToggled and sigMinToggled to decrease number of signals to 2:
     sigMinClicked = QtCore.Signal()
     sigDeMinClicked = QtCore.Signal()
     sigMaxClicked = QtCore.Signal()
@@ -355,6 +358,8 @@ class DockLabel(VerticalLabel):
     
     def __init__(self, text, dock, 
                  showCloseButton, showMinimizeButton, showMaximizeButton):
+
+        self.selected = False
         self.dim = False
         self.fixedWidth = False
         VerticalLabel.__init__(self, text, orientation='horizontal', forceWidth=False)
@@ -428,7 +433,11 @@ class DockLabel(VerticalLabel):
 
     def updateStyle(self):
         r = '3px'
-        if self.dim:
+        if self.selected:
+            fg = '#fff'
+            bg = '#44aa44'
+            border = '#2f762f'
+        elif self.dim:
             fg = '#aaa'
             bg = '#44a'
             border = '#339'
@@ -465,6 +474,14 @@ class DockLabel(VerticalLabel):
                 padding-right: 3px;
             }""" % (bg, fg, r, r, border)
             self.setStyleSheet(self.hStyle)
+
+    def setSelected(self, s):
+        '''
+        change label color when dock is selected
+        '''
+        if self.selected != s:
+            self.selected = s
+            self.updateStyle() 
 
     def setDim(self, d):
         if self.dim != d:
