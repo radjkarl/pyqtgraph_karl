@@ -108,7 +108,9 @@ class ParameterItem(QtGui.QTreeWidgetItem):
         pass
                 
     def contextMenuEvent(self, ev):
-        if not self.param.opts.get('removable', False) and not self.param.opts.get('renamable', False):
+        if (not self.param.opts.get('removable', False) 
+            and not self.param.opts.get('renamable', False)
+            and not self.param.opts.get('addToContextMenu', False)):
             return
             
         self.contextMenu.popup(ev.globalPos())
