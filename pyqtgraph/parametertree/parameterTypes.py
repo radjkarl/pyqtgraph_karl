@@ -629,7 +629,13 @@ class ActionParameterItem(ParameterItem):
         self.button.clicked.connect(self.buttonClicked)
         param.sigNameChanged.connect(self.paramRenamed)
         self.setText(0, '')
-        
+
+    def nameChanged(self, name):
+        '''
+        Pass method, otherwise name is additionally set in tableView
+        '''
+        pass
+       
     def treeWidgetChanged(self):
         ParameterItem.treeWidgetChanged(self)
         tree = self.treeWidget()
