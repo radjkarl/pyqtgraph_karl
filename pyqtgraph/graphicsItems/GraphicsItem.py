@@ -229,7 +229,7 @@ class GraphicsItem(object):
         #else:
             #r = ((abs(dt.m32())/(abs(dt.m12()) + abs(dt.m22()))) * (abs(dt.m31())/(abs(dt.m11()) + abs(dt.m21()))))**0.5
         #if r == 0:
-            #r = 1.  ## shouldn't need to do this; probably means the math above is wrong?
+            #r = 1.  ## shouldn't need to do this; probably means the utils above is wrong?
         #directionr = direction * r
         directionr = direction
         

@@ -45,8 +45,8 @@ class Node(QtCore.QObject):
         terminals       Dict-of-dicts specifying the terminals present on this Node.
                         Terminal specifications look like::
                         
-                            'inputTerminalName': {'io': 'in'}
-                            'outputTerminalName': {'io': 'out'} 
+                            'inputTerminalName': {'imgIO': 'in'}
+                            'outputTerminalName': {'imgIO': 'out'} 
                             
                         There are a number of optional parameters for terminals:
                         multi, pos, renamable, removable, multiable, bypass. See
@@ -92,7 +92,7 @@ class Node(QtCore.QObject):
         """Add a new input terminal to this Node with the given name. Extra
         keyword arguments are passed to Terminal.__init__.
         
-        This is a convenience function that just calls addTerminal(io='in', ...)"""
+        This is a convenience function that just calls addTerminal(imgIO='in', ...)"""
         #print "Node.addInput called."
         return self.addTerminal(name, io='in', **args)
         
@@ -100,7 +100,7 @@ class Node(QtCore.QObject):
         """Add a new output terminal to this Node with the given name. Extra
         keyword arguments are passed to Terminal.__init__.
         
-        This is a convenience function that just calls addTerminal(io='out', ...)"""
+        This is a convenience function that just calls addTerminal(imgIO='out', ...)"""
         return self.addTerminal(name, io='out', **args)
         
     def removeTerminal(self, term):

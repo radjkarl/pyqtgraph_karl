@@ -15,7 +15,7 @@ class PlotWidgetNode(Node):
     sigPlotChanged = QtCore.Signal(object)
     
     def __init__(self, name):
-        Node.__init__(self, name, terminals={'In': {'io': 'in', 'multi': True}})
+        Node.__init__(self, name, terminals={'In': {'imgIO': 'in', 'multi': True}})
         self.plot = None  # currently selected plot 
         self.plots = {}   # list of available plots user may select from
         self.ui = None 
@@ -120,7 +120,7 @@ class CanvasNode(Node):
     nodeName = 'CanvasWidget'
     
     def __init__(self, name):
-        Node.__init__(self, name, terminals={'In': {'io': 'in', 'multi': True}})
+        Node.__init__(self, name, terminals={'In': {'imgIO': 'in', 'multi': True}})
         self.canvas = None
         self.items = {}
         
@@ -169,9 +169,9 @@ class PlotCurve(CtrlNode):
     
     def __init__(self, name):
         CtrlNode.__init__(self, name, terminals={
-            'x': {'io': 'in'},
-            'y': {'io': 'in'},
-            'plot': {'io': 'out'}
+            'x': {'imgIO': 'in'},
+            'y': {'imgIO': 'in'},
+            'plot': {'imgIO': 'out'}
         })
         self.item = PlotDataItem()
     
@@ -203,8 +203,8 @@ class ScatterPlot(CtrlNode):
     
     def __init__(self, name):
         CtrlNode.__init__(self, name, terminals={
-            'input': {'io': 'in'},
-            'plot': {'io': 'out'}
+            'input': {'imgIO': 'in'},
+            'plot': {'imgIO': 'out'}
         })
         self.item = ScatterPlotItem()
         self.keys = []
@@ -291,8 +291,8 @@ class ScatterPlot(CtrlNode):
     
     #def __init__(self, name):
         #Node.__init__(self, name, terminals={
-            #'file': {'io': 'in'},
-            #'image': {'io': 'out'}
+            #'file': {'imgIO': 'in'},
+            #'image': {'imgIO': 'out'}
         #})
         #self.imageItem = graphicsItems.ImageItem()
         #self.handle = None

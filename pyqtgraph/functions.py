@@ -628,8 +628,7 @@ def transformCoordinates(tr, coords, transpose=False):
     """
     Map a set of 2D or 3D coordinates through a QTransform or QMatrix4x4.
     The shape of coords must be (2,...) or (3,...)
-    The mapping will _ignore_ any perspective transformations.
-    
+    The mapping will _ignore_ any perspective transftransformations 
     For coordinate arrays with ndim=2, this is basically equivalent to matrix multiplication.
     Most arrays, however, prefer to put the coordinate axis at the end (eg. shape=(...,3)). To 
     allow this, use transpose=True.

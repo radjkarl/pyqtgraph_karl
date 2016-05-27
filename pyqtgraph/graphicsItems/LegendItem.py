@@ -91,12 +91,12 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
             row -= 1
         nCol = self.columnCount*2
         #FIRST ROW FULL
-        if self.layout.columnCount() == self.columnCount*2:
-            for col in range(0,nCol+2,2):
+        if col == nCol:
+            for col in range(0,nCol,2):
                 #FIND RIGHT COLUMN
                 if not self.layout.itemAt(row, col):
                     break
-            if col == nCol:
+            if col+2 == nCol:
                 #MAKE NEW ROW
                 col = 0
                 row += 1

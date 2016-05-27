@@ -139,8 +139,8 @@ class Flowchart(Node):
     def addTerminal(self, name, **opts):
         term = Node.addTerminal(self, name, **opts)
         name = term.name()
-        if opts['io'] == 'in':  ## inputs to the flowchart become outputs on the input node
-            opts['io'] = 'out'
+        if opts['imgIO'] == 'in':  ## inputs to the flowchart become outputs on the input node
+            opts['imgIO'] = 'out'
             opts['multi'] = False
             self.inputNode.sigTerminalAdded.disconnect(self.internalTerminalAdded)
             try:
@@ -149,7 +149,7 @@ class Flowchart(Node):
                 self.inputNode.sigTerminalAdded.connect(self.internalTerminalAdded)
                 
         else:
-            opts['io'] = 'in'
+            opts['imgIO'] = 'in'
             #opts['multi'] = False
             self.outputNode.sigTerminalAdded.disconnect(self.internalTerminalAdded)
             try:

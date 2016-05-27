@@ -14,7 +14,7 @@ class ColumnSelectNode(Node):
     """Select named columns from a record array or MetaArray."""
     nodeName = "ColumnSelect"
     def __init__(self, name):
-        Node.__init__(self, name, terminals={'In': {'io': 'in'}})
+        Node.__init__(self, name, terminals={'In': {'imgIO': 'in'}})
         self.columns = set()
         self.columnList = QtGui.QListWidget()
         self.axis = 0
@@ -109,10 +109,10 @@ class RegionSelectNode(CtrlNode):
     def __init__(self, name):
         self.items = {}
         CtrlNode.__init__(self, name, terminals={
-            'data': {'io': 'in'},
-            'selected': {'io': 'out'},
-            'region': {'io': 'out'},
-            'widget': {'io': 'out', 'multi': True}
+            'data': {'imgIO': 'in'},
+            'selected': {'imgIO': 'out'},
+            'region': {'imgIO': 'out'},
+            'widget': {'imgIO': 'out', 'multi': True}
         })
         self.ctrls['display'].toggled.connect(self.displayToggled)
         self.ctrls['movable'].toggled.connect(self.movableToggled)
@@ -182,8 +182,8 @@ class EvalNode(Node):
     def __init__(self, name):
         Node.__init__(self, name, 
             terminals = {
-                'input': {'io': 'in', 'renamable': True},
-                'output': {'io': 'out', 'renamable': True},
+                'input': {'imgIO': 'in', 'renamable': True},
+                'output': {'imgIO': 'out', 'renamable': True},
             },
             allowAddInput=True, allowAddOutput=True)
         
@@ -258,7 +258,7 @@ class ColumnJoinNode(Node):
     
     def __init__(self, name):
         Node.__init__(self, name, terminals = {
-            'output': {'io': 'out'},
+            'output': {'imgIO': 'out'},
         })
         
         #self.items = []

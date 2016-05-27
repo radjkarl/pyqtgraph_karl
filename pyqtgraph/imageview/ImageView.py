@@ -371,7 +371,7 @@ class ImageView(QtGui.QWidget):
             self.ui.histogram.setMinimumWidth(135)
         elif text_old and text == '':
             a.showLabel(False)
-            self.ui.histogram.setMinimumWidth(95)
+            self.ui.histogram.setMinimumWidth(120)
 
     def setHistogramPrintView(self, printView=True, showHistogram=False):
         '''
@@ -518,11 +518,17 @@ class ImageView(QtGui.QWidget):
         
     def setCurrentIndex(self, ind):
         """Set the currently displayed frame index."""
-        self.currentIndex = np.clip(ind, 0, self.getProcessedImage().shape[0]-1)
-        self.updateImage()
-        self.ignoreTimeLine = True
-        self.timeLine.setValue(self.tVals[self.currentIndex])
-        self.ignoreTimeLine = False
+        ind = np.clip(ind, 0, self.getProcessedImage().shape[0]-1)
+        time = self.tVals[ind]
+        self.timeLine.setValue(time)
+        #self.currentIndex = np.clip(ind, 0, self.getProcessedImage().shape[0]-1)
+        #self.updateImage()
+        #self.ignoreTimeLine = True
+#         time = self.tVals[self.currentIndex]
+#         self.timeLine.setValue(time)
+#         self.sigTimeChanged.emit(self.currentIndex, time)
+#         self.ignoreTimeLine = False
+
 
     def jumpFrames(self, n):
         """Move video frame ahead n frames (may be negative)"""

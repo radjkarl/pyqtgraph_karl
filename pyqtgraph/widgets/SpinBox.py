@@ -119,7 +119,7 @@ class SpinBox(QtGui.QAbstractSpinBox):
         
         self.decOpts = ['step', 'minStep']
         
-        self.val = D(asUnicode(value))  ## Value is precise decimal. Ordinary math not allowed.
+        self.val = D(asUnicode(value))  ## Value is precise decimal. Ordinary utils not allowed.
         self.updateText()
         self.skipValidate = False
         self.setCorrectionMode(self.CorrectToPreviousValue)

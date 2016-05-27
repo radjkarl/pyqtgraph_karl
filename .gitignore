@@ -1,6 +1,7 @@
 __pycache__
 build
 *.pyc
+*.pyo
 *.swp
 MANIFEST
 deb_build
@@ -9,3 +10,4 @@ dist
 rtr.cvs
 /.pydevproject
 /.project
+/.settings/

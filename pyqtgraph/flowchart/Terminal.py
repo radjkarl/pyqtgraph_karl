@@ -16,7 +16,7 @@ class Terminal(object):
         **Arguments:**
         node            the node to which this terminal belongs
         name            string, the name of the terminal
-        io              'in' or 'out'
+        imgIO              'in' or 'out'
         optional        bool, whether the node may process without connection to this terminal
         multi           bool, for inputs: whether this terminal may make multiple connections
                         for outputs: whether this terminal creates a different value for each connection
@@ -29,9 +29,9 @@ class Terminal(object):
         ==============  =================================================================================
         """
         self._io = io
-        #self._isOutput = opts[0] in ['out', 'io']
-        #self._isInput = opts[0]] in ['in', 'io']
-        #self._isIO = opts[0]=='io'
+        #self._isOutput = opts[0] in ['out', 'imgIO']
+        #self._isInput = opts[0]] in ['in', 'imgIO']
+        #self._isIO = opts[0]=='imgIO'
         self._optional = optional
         self._multi = multi
         self._node = weakref.ref(node)
@@ -315,7 +315,7 @@ class Terminal(object):
             item.scene().removeItem(item)
         
     def saveState(self):
-        return {'io': self._io, 'multi': self._multi, 'optional': self._optional, 'renamable': self._renamable, 'removable': self._removable, 'multiable': self._multiable}
+        return {'imgIO': self._io, 'multi': self._multi, 'optional': self._optional, 'renamable': self._renamable, 'removable': self._removable, 'multiable': self._multiable}
 
 
 #class TerminalGraphicsItem(QtGui.QGraphicsItem):

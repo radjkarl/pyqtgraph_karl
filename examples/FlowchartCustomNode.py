@@ -25,8 +25,8 @@ cw.setLayout(layout)
 
 ## Create an empty flowchart with a single input and output
 fc = Flowchart(terminals={
-    'dataIn': {'io': 'in'},
-    'dataOut': {'io': 'out'}    
+    'dataIn': {'imgIO': 'in'},
+    'dataOut': {'imgIO': 'out'}    
 })
 w = fc.widget()
 
@@ -66,7 +66,7 @@ class ImageViewNode(Node):
     def __init__(self, name):
         self.view = None
         ## Initialize node with only a single input terminal
-        Node.__init__(self, name, terminals={'data': {'io':'in'}})
+        Node.__init__(self, name, terminals={'data': {'imgIO':'in'}})
         
     def setView(self, view):  ## setView must be called by the program
         self.view = view

@@ -137,18 +137,20 @@ class AxisItem(GraphicsWidget):
         '''
         #change label size
         self.labelStyle['font-size'] = '%spt' %ptSize
-        self.setLabel(self.labelText, self.labelUnits,**self.labelStyle)
-        
-        if not self.orientation in ['left', 'right']:
-            txtoffs =  int(5.0/9*ptSize)
-        else:
-            txtoffs = int(2.0/9*ptSize)
-        #change ticks sizes and tickValue distances
-        self.setStyle(tickLength=-int(ptSize*0.7),
-                      tickTextOffset=txtoffs,
-                      tickTextWidth=int(30.0/9*ptSize),
-                      tickTextHeight=int(18.0/9*ptSize),
-                      )
+        if self.isVisible():
+            #only exec if visible, otherwise it would create empty space 
+            #TODO: if exec when axis is not visible creates warning: 'QPainter::font: Painter not active'
+            self.setLabel(self.labelText, self.labelUnits,**self.labelStyle)
+            if not self.orientation in ['left', 'right']:
+                txtoffs =  int(5.0/9*ptSize)
+            else:
+                txtoffs = int(2.0/9*ptSize)
+            #change ticks sizes and tickValue distances
+            self.setStyle(tickLength=-int(ptSize*0.7),
+                          tickTextOffset=txtoffs,
+                          tickTextWidth=int(30.0/9*ptSize),
+                          tickTextHeight=int(18.0/9*ptSize),
+                          )
         #change tickValue size
         if self.tickFont == None:
             tickFont = QtGui.QPainter().font()

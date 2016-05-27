@@ -6,7 +6,7 @@ from ..python2_3 import asUnicode
 
 from Container import TContainer
 
-import weakref
+# import weakref
 
 class Dock(QtGui.QWidget, DockDrop):
     
@@ -22,7 +22,7 @@ class Dock(QtGui.QWidget, DockDrop):
         QtGui.QWidget.__init__(self)
         DockDrop.__init__(self)
         self.area = area
-        self.label = DockLabel(name, weakref.proxy(self), closable, minimizable, maximizable)
+        self.label = DockLabel(name, self, closable, minimizable, maximizable)
           
         if closable:
             self.label.sigCloseClicked.connect(self.close)
@@ -100,7 +100,7 @@ class Dock(QtGui.QWidget, DockDrop):
         if len(self.area.docks) == 1:
             lastDock = self.area.docks.values()[0]
             lastDock.label.showControls(False)
-        #show label.controls if when second dock is added
+        #show label.controls when second dock is added
         elif len(self.area.docks) == 2:
             for dock in self.area.docks.values():
                 dock.label.showControls()

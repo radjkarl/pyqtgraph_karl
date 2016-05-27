@@ -93,7 +93,7 @@ class Point(QtCore.QPointF):
         return self._math_('__pow__', a)
     
     def _math_(self, op, x):
-        #print "point math:", op
+        #print "point utils:", op
         #try:
             #fn  = getattr(QtCore.QPointF, op)
             #pt = fn(self, x)

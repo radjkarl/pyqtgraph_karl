@@ -79,7 +79,7 @@ if USE_PYSIDE:
         """
         import pysideuic
         import xml.etree.ElementTree as xml
-        #from io import StringIO
+        #from imgIO import StringIO
         
         parsed = xml.parse(uiFile)
         widget_class = parsed.find('widget').get('class')
