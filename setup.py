@@ -1,4 +1,7 @@
 DESCRIPTION = """\
+Temporary fork of Luke's great 'pyqtgraph'.
+It is intended to merge most of it as some time in the future.
+---
 PyQtGraph is a pure-python graphics and GUI library built on PyQt4/PySide and
 numpy. 
 
@@ -9,7 +12,7 @@ heavy leverage of numpy for number crunching, Qt's GraphicsView framework for
 """
 
 setupOpts = dict(
-    name='pyqtgraph',
+    name='pyqtgraph_karl',
     description='Scientific Graphics and GUI Library for Python',
     long_description=DESCRIPTION,
     license='MIT',
@@ -47,8 +50,12 @@ path = os.path.split(__file__)[0]
 sys.path.insert(0, os.path.join(path, 'tools'))
 import setupHelpers as helpers
 
+##################
+### distribute this forc as pyqtgraph_karl using the added hard link 
+### (mklink /J) 'pyqtgraph_karl' linking to 'pyqtgraph'
 ## generate list of all sub-packages
-allPackages = helpers.listAllPackages(pkgroot='pyqtgraph') + ['pyqtgraph.examples']
+allPackages = helpers.listAllPackages(pkgroot='pyqtgraph_karl')
+##################
 
 ## Decide what version string to use in the build
 version, forcedVersion, gitVersion, initVersion = helpers.getVersionStrings(pkg='pyqtgraph')

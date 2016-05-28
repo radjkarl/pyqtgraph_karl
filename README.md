@@ -1,3 +1,8 @@
+pyqtgraph_karl
+==============
+A dirty and only temporary fork of Luke's awesome 'pyqtgraph' package.
+It is aimed to partly merge with 'pyqtgraph' in the future.
+
 PyQtGraph
 =========
 
