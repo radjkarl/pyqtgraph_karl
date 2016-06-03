@@ -634,7 +634,10 @@ class ImageView(QtGui.QWidget):
             sl = [slice(None)] * data.ndim
             sl[ax] = slice(None, None, 2)
             data = data[sl]
-        return nanmin(data), nanmax(data)
+        if np.issubdtype(data.dtype, np.float):
+            return nanmin(data), nanmax(data)
+        else:
+            return data.min(), data.max()
 
     def normalize(self, image):
         """
