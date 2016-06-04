@@ -28,3 +28,5 @@ encoding//pyqtgraph/widgets/SpinBox.py=utf-8
 encoding//pyqtgraph/widgets/TableWidget.py=utf-8
 encoding//pyqtgraph/widgets/TreeWidget.py=utf-8
 encoding//pyqtgraph/widgets/VerticalLabel.py=utf-8
+encoding//pyqtgraph_karl/__init__.py=utf-8
+encoding//pyqtgraph_karl/imageview/ImageView.py=utf-8
