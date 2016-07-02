@@ -365,13 +365,10 @@ class ImageView(QtGui.QWidget):
         :func:`AxisItem.setLabel() <pyqtgraph.AxisItem.setLabel>`
         """
         a = self.ui.histogram.axis
-        text_old = a.labelText
         a.setLabel(text, **kwargs)
-        if not text_old and text:
-            self.ui.histogram.setMinimumWidth(135)
-        elif text_old and text == '':
+        if text == '':
             a.showLabel(False)
-            self.ui.histogram.setMinimumWidth(120)
+        self.ui.histogram.setMinimumWidth(135)
 
     def setHistogramPrintView(self, printView=True, showHistogram=False):
         '''
