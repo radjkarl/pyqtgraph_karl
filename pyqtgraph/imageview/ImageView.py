@@ -340,7 +340,7 @@ class ImageView(QtGui.QWidget):
             
         self.lastPlayTime = ptime.time()
         if not self.playTimer.isActive():
-            self.playTimer.start(16)
+            self.playTimer.start(abs(int(1000/rate)))
 
     def setOpts(self, **opts):
         '''
@@ -426,7 +426,12 @@ class ImageView(QtGui.QWidget):
             self.levelMin, self.levelMax = list(map(float, self.quickMinMax(self.imageDisp)))
             
         return self.imageDisp
-        
+
+    @property
+    def nframes(self):
+        return self.getProcessedImage().shape[0]
+
+   
     def close(self):
         """Closes the widget nicely, making sure to clear the graphics scene and release memory."""
         self.ui.roiPlot.close()
@@ -437,21 +442,21 @@ class ImageView(QtGui.QWidget):
         self.setParent(None)
         
     def keyPressEvent(self, ev):
-        #print ev.key()
         if ev.key() == QtCore.Qt.Key_Space:
             if self.playRate == 0:
-                fps = (self.getProcessedImage().shape[0]-1) / (self.tVals[-1] - self.tVals[0])
+                fps = (self.nframes-1) / (self.tVals[-1] - self.tVals[0])
                 self.play(fps)
-                #print fps
             else:
-                self.play(0)
+                self.play(self.playRate)
+#             else:
+#                 self.play(0)
             ev.accept()
         elif ev.key() == QtCore.Qt.Key_Home:
             self.setCurrentIndex(0)
             self.play(0)
             ev.accept()
         elif ev.key() == QtCore.Qt.Key_End:
-            self.setCurrentIndex(self.getProcessedImage().shape[0]-1)
+            self.setCurrentIndex(self.nframes-1)
             self.play(0)
             ev.accept()
         elif ev.key() in self.noRepeatKeys:
@@ -509,13 +514,13 @@ class ImageView(QtGui.QWidget):
         n = int(self.playRate * dt)
         if n != 0:
             self.lastPlayTime += (float(n)/self.playRate)
-            if self.currentIndex+n > self.image.shape[0]:
+            if self.currentIndex+n > self.nframes:
                 self.play(0)
             self.jumpFrames(n)
         
     def setCurrentIndex(self, ind):
         """Set the currently displayed frame index."""
-        ind = np.clip(ind, 0, self.getProcessedImage().shape[0]-1)
+        ind = np.clip(ind, 0, self.nframes-1)
         time = self.tVals[ind]
         self.timeLine.setValue(time)
         #self.currentIndex = np.clip(ind, 0, self.getProcessedImage().shape[0]-1)
@@ -689,7 +694,7 @@ class ImageView(QtGui.QWidget):
         #(ind, time) = self.timeIndex(self.ui.timeSlider)
         if self.ignoreTimeLine:
             return
-        self.play(0)
+#         self.play(0)
         (ind, time) = self.timeIndex(self.timeLine)
         if ind != self.currentIndex:
             self.currentIndex = ind
