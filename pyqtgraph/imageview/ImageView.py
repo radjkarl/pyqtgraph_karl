@@ -431,7 +431,6 @@ class ImageView(QtGui.QWidget):
     def nframes(self):
         return self.getProcessedImage().shape[0]
 
-   
     def close(self):
         """Closes the widget nicely, making sure to clear the graphics scene and release memory."""
         self.ui.roiPlot.close()
