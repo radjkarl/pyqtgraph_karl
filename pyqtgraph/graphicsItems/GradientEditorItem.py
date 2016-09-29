@@ -447,7 +447,7 @@ class GradientEditorItem(TickSliderItem):
         self.updateGradient()
 
     def showTicks(self, show=True):
-        for tick in self.ticks.iterkeys():
+        for tick in self.ticks.keys():
             if show:
                 tick.show()
                 orig = getattr(self, '_allowAdd_backup', None)
@@ -784,13 +784,13 @@ class GradientEditorItem(TickSliderItem):
         for t in state['ticks']:
             c = QtGui.QColor(*t[1])
             self.addTick(t[0], c, finish=False)
-        self.showTicks( state.get('ticksVisible', self.ticks.keys()[0].isVisible()) )
+        self.showTicks( state.get('ticksVisible', next(iter(self.ticks)).isVisible()) )
         self.updateGradient()
         self.sigGradientChangeFinished.emit(self)
         
     def setColorMap(self, cm):
         self.setColorMode('rgb')
-        for t in list(self.ticks.keys()):
+        for t in self.ticks.keys():
             self.removeTick(t, finish=False)
         colors = cm.getColors(mode='qcolor')
         for i in range(len(cm.pos)):

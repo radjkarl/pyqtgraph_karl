@@ -20,8 +20,13 @@
 #     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #     OTHER DEALINGS IN THE SOFTWARE.
 
-from UserDict import DictMixin
-
+#py3 issue:
+try:
+    #py2
+    from UserDict import DictMixin
+except ImportError:
+    from collections import MutableMapping as DictMixin
+    
 class OrderedDict(dict, DictMixin):
 
     def __init__(self, *args, **kwds):
@@ -94,9 +99,9 @@ class OrderedDict(dict, DictMixin):
     pop = DictMixin.pop
     values = DictMixin.values
     items = DictMixin.items
-    iterkeys = DictMixin.iterkeys
-    itervalues = DictMixin.itervalues
-    iteritems = DictMixin.iteritems
+    iterkeys = DictMixin.keys
+    itervalues = DictMixin.values
+    iteritems = DictMixin.items
 
     def __repr__(self):
         if not self:

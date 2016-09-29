@@ -4,7 +4,7 @@ from .DockDrop import *
 from ..widgets.VerticalLabel import VerticalLabel
 from ..python2_3 import asUnicode
 
-from Container import TContainer
+from .Container import TContainer
 
 # import weakref
 
@@ -98,7 +98,7 @@ class Dock(QtGui.QWidget, DockDrop):
         ''' 
         #hide dock.label.controls if only on dock is in area
         if len(self.area.docks) == 1:
-            lastDock = self.area.docks.values()[0]
+            lastDock = next(iter(self.area.docks.values()))
             lastDock.label.showControls(False)
         #show label.controls when second dock is added
         elif len(self.area.docks) == 2:
@@ -260,7 +260,7 @@ class Dock(QtGui.QWidget, DockDrop):
         if self._container != self.area.topContainer:
             self._container.apoptose()
         self._container = None
-        for key, value in self.area.docks.iteritems():
+        for key, value in self.area.docks.items():
             #have to iterate because the dock.name() can be different now
             if value == self:
                 self.area.docks.pop(key)
