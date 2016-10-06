@@ -759,7 +759,8 @@ class GradientEditorItem(TickSliderItem):
         for t in self.ticks:
             c = t.color
             ticks.append((self.ticks[t], (c.red(), c.green(), c.blue(), c.alpha())))
-        state = {'mode': self.colorMode, 'ticks': ticks, 'ticksVisible':self.ticks.keys()[0].isVisible()}
+        state = {'mode': self.colorMode, 'ticks': ticks, 
+                 'ticksVisible':next(iter(self.ticks)).isVisible()}
         return state
         
     def restoreState(self, state):

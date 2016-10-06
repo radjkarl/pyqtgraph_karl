@@ -277,10 +277,13 @@ class Parameter(QtCore.QObject):
         The tree state may be restored from this structure using restoreState()
         """
         state = self.opts.copy()
-        for key, value in state.items():
+        
+        for key, value in list(state.items()):
             #remove pointers to instances that cannot be restored
+            #e.g. with entry 'addToContextMenu'
             if 'object at 0x' in value.__repr__():
-                state.pop(key)    
+                state.pop(key)   
+             
         state['children'] = OrderedDict([(ch.name(), ch.saveState()) for ch in self])
         if state['type'] is None:
             global PARAM_NAMES
