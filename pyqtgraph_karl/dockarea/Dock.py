@@ -334,27 +334,26 @@ class DockLabel(DL):
             self.minButton.show() if show else self.minButton.hide()
         if self.maxButton:
             self.maxButton.show() if show else self.maxButton.hide()
-        #if self.closeButton:
-        #    self.closeButton.show() if show else self.closeButton.hide()
-    
+ 
     #ADDED
     def minButtonSetIcon(self):
+        s = QtGui.QApplication.style()
         if self.minimized:
-            self.minButton.setIcon(QtGui.QApplication.style().standardIcon(
+            self.minButton.setIcon(s.standardIcon(
                                             QtGui.QStyle.SP_TitleBarNormalButton))
         else:   
-            self.minButton.setIcon(QtGui.QApplication.style().standardIcon(
+            self.minButton.setIcon(s.standardIcon(
                                             QtGui.QStyle.SP_TitleBarMinButton))
     
     #ADDED
     def maxButtonSetIcon(self):
+        s = QtGui.QApplication.style()
         if self.maximized:
-            self.maxButton.setIcon(QtGui.QApplication.style().standardIcon(
+            self.maxButton.setIcon(s.standardIcon(
                                             QtGui.QStyle.SP_TitleBarNormalButton))
         else:   
-            self.maxButton.setIcon(QtGui.QApplication.style().standardIcon(
+            self.maxButton.setIcon(s.standardIcon(
                                             QtGui.QStyle.SP_TitleBarMaxButton))
-
 
     #ADDED
     def toggleMinimize(self):

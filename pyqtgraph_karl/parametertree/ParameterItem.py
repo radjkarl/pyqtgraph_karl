@@ -6,15 +6,19 @@ class ParameterItem(PI):
     def __init__(self, param, depth=0):
         PI.__init__(self, param, depth)
         
-        menuitems = self.param.opts.get('addToContextMenu', [])
-        for i in menuitems:
-            if isinstance(i, QtGui.QMenu):
-                self.contextMenu.addMenu(i)
-            elif isinstance(i, QtGui.QAction):
-                self.contextMenu.addAction(i)
-            else:
-                raise AttributeError('need either QMenu or QAction instances to add to the context menu')
-
+        menuitems = self.param.opts.get('addToContextMenu', None)
+        if menuitems:
+            for i in menuitems:
+                if isinstance(i, QtGui.QMenu):
+                    #try:
+                    self.contextMenu.addMenu(i)
+                    #except RuntimeError:
+                    #    pass
+                elif isinstance(i, QtGui.QAction):
+                    self.contextMenu.addAction(i)
+                else:
+                    raise AttributeError('need either QMenu or QAction instances to add to the context menu')
+            self.param.opts.pop('addToContextMenu')
         # SLIDING
         if param.opts.get('sliding', False):
             self.controls = QtGui.QWidget()

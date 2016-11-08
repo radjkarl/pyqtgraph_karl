@@ -31,16 +31,17 @@ class Parameter(PP):
     #TODO: remove either sigChildRemoved or sigRemoved
 
     
-    def saveState(self, *args, **kwargs):
-        state = PP.saveState(self, *args, **kwargs)
-
-        for key, value in list(state.items()):
-            #remove pointers to instances that cannot be restored
-            #e.g. with entry 'addToContextMenu'
-            if 'object at 0x' in value.__repr__():
-                state.pop(key)   
-        
-        return state
+#     def saveState(self, *args, **kwargs):
+#         state = PP.saveState(self, *args, **kwargs)
+# 
+# #         for key, value in list(state.items()):
+# #             #remove pointers to instances that cannot be restored
+# #             #e.g. with entry 'addToContextMenu'
+# #             if 'object at 0x' in value.__repr__():
+# #                 state.pop(key)
+# #         try: state.pop('addToContextMenu')
+# #         except KeyError: pass
+#         return state
     
     ##added duplicate feature
     def addChild(self, child, duplicate=False):

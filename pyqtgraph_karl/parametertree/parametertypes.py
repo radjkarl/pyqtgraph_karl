@@ -179,7 +179,6 @@ class MenuParameterItem(WidgetParameterItem):
     """
 
     def __init__(self, param, depth):
-
         WidgetParameterItem.__init__(self, param, depth)
         self.hideWidget = False
 
